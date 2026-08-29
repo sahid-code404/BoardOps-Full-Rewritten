@@ -1,18 +1,18 @@
-# Dependency / Version Matrix — Phase 00 Proposal
+# Dependency / Version Matrix — Phase 01 Verified Baseline
 
-Verified against official/project package sources on **2026-08-29**. Pin exact versions in the initial lockfiles; upgrade deliberately after compatibility/CI review. Latest means stable, not alpha/beta/RC/nightly.
+Verified against official/project package sources and Phase 01 CI on **2026-08-29**. Exact versions present in the Phase 01 manifests/lockfiles are pinned and verified. Rows for later-phase capabilities remain approved target versions only and must be reverified when those packages are actually introduced.
 
 ## Toolchain
 
-| Name               | Exact version | Purpose                      | Why needed                            | Alternatives rejected                     | Runtime impact         | Maintenance risk     |
-| ------------------ | ------------: | ---------------------------- | ------------------------------------- | ----------------------------------------- | ---------------------- | -------------------- |
-| Node.js            |   24.20.0 LTS | JS tooling/CI                | Stable LTS for Vite/pnpm tooling      | Node 26 Current: avoid current-line churn | Build-time only        | Low                  |
-| pnpm               |       11.23.0 | JS workspace/package manager | Strict, efficient monorepo installs   | npm/yarn: no product benefit here         | Build-time only        | Low                  |
-| TypeScript         |         7.0.2 | Web/API type checking        | Current stable baseline               | JS-only: weaker contracts                 | Build-time only        | Medium: recent major |
-| Prettier           |         3.9.6 | Deterministic formatting     | Reduces formatting churn              | Hand formatting                           | Build-time only        | Low                  |
-| Vitest             |        4.1.11 | TS unit/domain tests         | Vite-native fast tests                | Jest: extra stack                         | Dev/CI only            | Low                  |
-| @playwright/test   |        1.62.1 | Cross-browser critical E2E   | Required production flow validation   | Cypress: redundant second E2E stack       | Dev/CI; browsers large | Medium               |
-| openapi-typescript |        7.13.0 | OpenAPI → TS types           | Runtime-free generated contract types | Hand-maintained types                     | Build-time only        | Low                  |
+| Name               | Exact version | Purpose                      | Why needed                                                          | Alternatives rejected                              | Runtime impact  | Maintenance risk       |
+| ------------------ | ------------: | ---------------------------- | ------------------------------------------------------------------- | -------------------------------------------------- | --------------- | ---------------------- |
+| Node.js            |   24.20.0 LTS | JS tooling/CI                | Stable LTS for Vite/pnpm tooling                                    | Node 26 Current: avoid current-line churn          | Build-time only | Low                    |
+| pnpm               |       11.23.0 | JS workspace/package manager | Strict, efficient monorepo installs                                 | npm/yarn: no product benefit here                  | Build-time only | Low                    |
+| TypeScript         |         6.0.3 | Web/API type checking        | Newest stable mutually compatible pin verified with current tooling | TypeScript 7: unsupported by selected lint tooling | Build-time only | Medium: compatibility  |
+| Prettier           |         3.9.6 | Deterministic formatting     | Reduces formatting churn                                            | Hand formatting                                    | Build-time only | Low                    |
+| Vitest             |        4.1.11 | TS unit/domain tests         | Vite-native fast tests                                              | Jest: extra stack                                  | Dev/CI only     | Low                    |
+| @playwright/test   |        1.62.1 | Cross-browser critical E2E   | Required production flow validation                                 | Cypress: redundant second E2E stack                | Dev/CI; browsers large | Medium            |
+| openapi-typescript |        7.13.0 | OpenAPI → TS types           | Runtime-free generated contract types                               | Hand-maintained types                              | Build-time only | Low                    |
 
 ## Web (`apps/web`)
 
@@ -41,12 +41,12 @@ Verified against official/project package sources on **2026-08-29**. Pin exact v
 | hono                    |        4.13.5 | Worker HTTP framework                      | Web-standard, small, Workers-compatible | Express/Fastify: Node assumptions/weight | Very small     | Low                       |
 | @hono/zod-validator     |         0.9.0 | Request validation adapter                 | Clean Hono + Zod integration            | Repeated route boilerplate               | Tiny           | Low                       |
 | zod                     |         4.5.0 | Runtime request/domain boundary validation | Shared validation vocabulary            | Ad-hoc checks                            | Small          | Low                       |
-| wrangler                |       4.126.0 | Cloudflare dev/deploy/types                | Official Workers CLI                    | Custom deploy scripts                    | Dev/CI only    | Medium: frequent releases |
+| wrangler                |       4.127.0 | Cloudflare dev/deploy/types                | Official Workers CLI                    | Custom deploy scripts                    | Dev/CI only    | Medium: frequent releases |
 | @cloudflare/vite-plugin |        1.54.1 | Vite ↔ workerd integration                 | Production-like Worker development      | Legacy Workers Sites tooling             | Dev/build      | Medium                    |
 
 Platform bindings require **no wrapper dependency** by default: D1, R2, Queues, Workflows, Rate Limiting, and Web Crypto use Cloudflare/standards APIs. Generate binding types with `wrangler types`; do not add `@cloudflare/workers-types` as a competing manually maintained source unless a verified tooling requirement appears.
 
-No ORM is approved in Phase 00. D1 schema/migration/query strategy must be chosen for correctness, transaction behavior, SQL visibility, and Workers compatibility before adding a package. The old Prisma/SQLite stack is explicitly not migrated.
+No ORM is approved in Phase 01. D1 schema/migration/query strategy must be chosen for correctness, transaction behavior, SQL visibility, and Workers compatibility before adding a package. The old Prisma/SQLite stack is explicitly not migrated.
 
 ## Flutter (`apps/mobile`)
 
@@ -73,7 +73,7 @@ No ORM is approved in Phase 00. D1 schema/migration/query strategy must be chose
 
 ## OTA
 
-Shorebird remains the accepted OTA mechanism. `shorebird_code_push` **2.0.7** is optional and should be added only if BoardOps needs an in-app check/download/status UI; automatic Shorebird update behavior does not require adding it solely to enable patches. Shorebird CLI itself is an external release tool, not a pub dependency. CI must record the installed stable CLI version and verify the selected Flutter SDK is supported before each release. Shorebird documentation currently lists Android/iOS support from Flutter 3.24+ and recommends latest stable Flutter.
+Shorebird remains the accepted OTA mechanism. `shorebird_code_push` **2.0.7** is optional and should be added only if BoardOps needs an in-app check/download/status UI; automatic Shorebird update behavior does not require adding it solely to enable patches. Shorebird CLI itself is an external release tool, not a pub dependency. CI must record the installed stable CLI version and verify the selected Flutter SDK is supported before each release.
 
 ## Explicitly rejected legacy dependencies/approaches
 
@@ -85,11 +85,13 @@ Shorebird remains the accepted OTA mechanism. `shorebird_code_push` **2.0.7** is
 - `framer-motion` old package naming when current `motion` is sufficient.
 - Client-side financial calculation libraries as a second source of truth.
 
-## Compatibility gates before Phase 01 lockfile
+## Phase 01 compatibility gate results
 
-1. Run minimal React/Vite/TS7 build with React Router 8.3.
-2. Run Hono/Workers integration under workerd using the Cloudflare Vite plugin.
-3. Generate Worker binding types using the selected Wrangler.
-4. Run a minimal Flutter 3.47.1 app with go_router/Riverpod/Drift codegen.
-5. Verify Shorebird supports the exact Flutter engine used by the release toolchain.
-6. If any newest-stable pair is incompatible, pin the newest mutually compatible stable versions and document the downgrade in an ADR before implementation.
+1. React/Vite with TypeScript 6.0.3: **PASS** in CI.
+2. Hono/Workers build with the Cloudflare Vite plugin: **PASS** in CI.
+3. Wrangler binding generation using `wrangler types`: **PASS** in CI.
+4. Minimal Flutter 3.47.1 app with go_router/Riverpod: **PASS** analyze, tests, Android build and iOS no-codesign compile in CI.
+5. Shorebird compatibility remains a release/OTA-phase gate because OTA is not implemented in Phase 01.
+6. TypeScript 7 was not used because the selected `typescript-eslint` release does not officially support it; the compatible TypeScript 6.0.3 pin is documented in ADR-014.
+
+Final verification: GitHub Actions run `33261749202` completed successfully for all Phase 01 jobs.
