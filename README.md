@@ -4,7 +4,7 @@ BoardOps is being rebuilt from scratch as a production-grade institutional mess 
 
 ## Current phase
 
-**Phase 02 — Shared design language is in implementation/verification.**
+**Phase 02 — Shared design language is runnable and ready for manual visual testing.**
 
 Active implementation branch: `phase/02-shared-design-language`.
 
@@ -35,6 +35,25 @@ pnpm design:tokens:check
 
 Do not hand-edit the generated Web or Flutter token files. Edit `packages/design-tokens/tokens.json` and regenerate them.
 
-## Verification status
+## Verified Phase 02 CI
 
-Phase 02 CI is pending. Do not treat this branch as a completed checkpoint until Web/API, Flutter Android and Flutter iOS jobs are green.
+GitHub Actions run `33263066836` passed all required jobs:
+
+- Web/API formatting, lint, TypeScript, token synchronization, unit tests and builds;
+- Flutter analyze and widget/unit tests;
+- Android debug APK build;
+- iOS no-codesign compile validation.
+
+## Web manual testing
+
+From the repository root:
+
+```bash
+git fetch origin
+git switch phase/02-shared-design-language
+git pull --ff-only origin phase/02-shared-design-language
+pnpm install --frozen-lockfile
+pnpm --filter @boardops/web dev
+```
+
+Open `http://localhost:5173` and review both Light and Dark preview states at desktop and narrow/mobile widths.

@@ -12,6 +12,8 @@
 - Added Flutter BoardOps theme, `GlassPanel` and `BoardOpsStatusChip` primitives.
 - Added responsive Phase 02 preview surfaces, semantic light/dark colors, reduced-motion behavior and 44 px minimum touch targets.
 - Added Phase 02 architecture and implementation-history documentation.
+- Verified Web/API, Flutter Android and Flutter iOS gates green in GitHub Actions run `33263066836`.
+- Marked the Phase 02 visual checkpoint runnable for manual Web review before business modules begin.
 
 ### Phase 01 — Architecture
 
