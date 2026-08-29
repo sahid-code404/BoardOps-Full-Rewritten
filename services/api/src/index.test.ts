@@ -18,11 +18,7 @@ function testBindings(databaseReady = true): CloudflareBindings {
 
 describe("BoardOps API foundation", () => {
   it("returns a versioned liveness response", async () => {
-    const response = await app.request(
-      "/api/v1/health",
-      {},
-      testBindings(),
-    );
+    const response = await app.request("/api/v1/health", {}, testBindings());
     expect(response.status).toBe(200);
     const body = await response.json();
     expect(body).toMatchObject({
