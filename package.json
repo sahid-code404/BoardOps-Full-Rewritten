@@ -8,11 +8,13 @@
   },
   "scripts": {
     "dev": "pnpm --parallel --stream --filter @boardops/web --filter @boardops/api dev",
+    "design:tokens": "node scripts/generate-design-tokens.mjs",
+    "design:tokens:check": "node scripts/generate-design-tokens.mjs --check",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "typecheck": "pnpm -r --if-present typecheck",
-    "test": "pnpm -r --if-present test",
+    "test": "pnpm design:tokens:check && pnpm -r --if-present test",
     "build": "pnpm -r --if-present build",
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build"
   },

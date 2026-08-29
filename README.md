@@ -4,63 +4,56 @@ BoardOps is being rebuilt from scratch as a production-grade institutional mess 
 
 ## Current phase
 
-**Phase 01 — Architecture checkpoint is ready for review and manual testing.**
+**Phase 02 — Shared design language is runnable and ready for manual visual testing.**
 
-Active implementation branch: `phase/01-architecture`.
+Active implementation branch: `phase/02-shared-design-language`.
 
-The existing application at `sahid-code404/BoardOpsv2rewrite` remains a **read-only reference**. Its legacy implementation is not copied into the rewrite.
+The existing application at `sahid-code404/BoardOpsv2rewrite` remains a **read-only visual and functional reference**. Legacy framework code is not copied into the rewrite.
 
-Phase 01 establishes only the clean technical foundation:
+Phase 01 is merged into `main`. Phase 02 establishes the shared visual foundation before any major business screen is rebuilt:
 
-- React + Vite web application
-- Cloudflare Workers + Hono API
-- Flutter mobile application
-- shared OpenAPI/API-contract package
-- architecture, environment and boundary documentation
-- deterministic pnpm and Flutter lockfiles
-- GitHub Actions verification for Web/API/Android/iOS
+- canonical platform-neutral semantic design tokens;
+- generated Web and Flutter token outputs with drift checks;
+- purple/graphite light/dark identity;
+- bounded premium glass system;
+- large rounded geometry;
+- typography, spacing, status and chart semantics;
+- purposeful motion with reduced-motion handling;
+- responsive/safe-area rules;
+- initial reusable React and Flutter visual primitives.
 
-Business modules intentionally begin in later phases.
+Business modules intentionally remain absent in this phase.
 
-## Verified Phase 01 CI
-
-GitHub Actions run `33261749202` passed all Phase 01 jobs:
-
-- Web/API formatting, lint, TypeScript checks, unit tests and builds
-- Wrangler Worker binding type generation
-- Flutter analysis and widget/unit tests
-- Android debug APK build
-- iOS no-codesign compile validation
-
-## Local verification
+## Design-token workflow
 
 From the repository root:
 
 ```bash
-git switch phase/01-architecture
-git pull
+pnpm design:tokens
+pnpm design:tokens:check
+```
 
-corepack enable
-corepack prepare pnpm@11.23.0 --activate
+Do not hand-edit the generated Web or Flutter token files. Edit `packages/design-tokens/tokens.json` and regenerate them.
+
+## Verified Phase 02 CI
+
+GitHub Actions run `33263066836` passed all required jobs:
+
+- Web/API formatting, lint, TypeScript, token synchronization, unit tests and builds;
+- Flutter analyze and widget/unit tests;
+- Android debug APK build;
+- iOS no-codesign compile validation.
+
+## Web manual testing
+
+From the repository root:
+
+```bash
+git fetch origin
+git switch phase/02-shared-design-language
+git pull --ff-only origin phase/02-shared-design-language
 pnpm install --frozen-lockfile
-pnpm check
-
-./scripts/bootstrap-mobile.sh
-```
-
-To create the Android debug APK after the bootstrap:
-
-```bash
-cd apps/mobile
-flutter build apk --debug
-```
-
-To run the foundation web/API locally, use two terminals from the repository root:
-
-```bash
-pnpm --filter @boardops/api dev
-```
-
-```bash
 pnpm --filter @boardops/web dev
 ```
+
+Open `http://localhost:5173` and review both Light and Dark preview states at desktop and narrow/mobile widths.
