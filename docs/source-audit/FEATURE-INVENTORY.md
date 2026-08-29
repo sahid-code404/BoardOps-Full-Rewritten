@@ -1,0 +1,42 @@
+# Source Feature Inventory
+
+Reference: `sahid-code404/BoardOpsv2rewrite` at `77f3dec3b264c42904207f27c5f008b33c03b868`, plus the supplied BoardOps specification.
+
+Status vocabulary: **PRESERVED**, **REFINED**, **CORRECTED**, **REPLACED**, **DEFERRED**, **REMOVED**.
+
+| Feature/domain | Source evidence/behavior | Target disposition |
+|---|---|---|
+| Authentication | Register/login, email verification/status/resend, forgot/reset password, profile/password, sessions, 2FA endpoints | REFINED — keep flows, rebuild for Workers-compatible security and contract |
+| Account approval | Pending/active/suspended/archived concepts and user admin | REFINED — explicit state machine + Request Changes |
+| Dashboard | Resident/admin KPI/dashboard surfaces | REFINED — permission-aware + fixed resident v1 layout |
+| Meal configuration | Dynamic meal definitions, service/cutoff/status/order concepts | PRESERVED/REFINED |
+| Resident meal scheduling | User meals view, ON/OFF/LOCKED behavior | CORRECTED — continuous schedule, authoritative cutoff/holiday rules |
+| Kitchen/meal counts | Operational counts and resident expansion | REFINED |
+| Guest meals | Source domain support | REFINED — auto-accepted v1, configurable charge |
+| Holidays | Source API/domain support | REFINED — explicit exclusion from counts/billing |
+| Bills | Generation/history/statuses/details | CORRECTED — one accounting source, integer minor units, immutable snapshot boundary |
+| Payments/deposits | Submit/proof/reference/approve/reject/void/delete flows | CORRECTED — atomic ledger/outbox/audit, immutable approved finance |
+| Refunds | Refund domain/API | REFINED — partial tracked refunds + immutable settlement trail |
+| Adjustments | Adjustment domain/API | PRESERVED/REFINED — becomes mandatory correction mechanism |
+| Resident fund | Ledger-derived account view | CORRECTED — DB-enforced nonnegative invariant, concurrency-safe ledger |
+| Restriction engine | Financial restriction logic exists | REFINED — policy/state-machine driven, reasoned exemption/lift |
+| Expenses | Expense creation/history/categories/deletion | CORRECTED — approval + snapshot lock + no authoritative hard delete |
+| Purchases/items | Purchase data represented and linked to expenses | REFINED — distinct purchase engine |
+| Monthly closing | Readiness/snapshot/generate/settle/close implementation | REPLACED architecturally — durable Workflow + true atomic/idempotent steps |
+| Variables | System/custom variables | REFINED — typed/versioned/scoped config registry |
+| Formula engine | Safe tokenizer/parser/AST; no `eval` | PRESERVED/REFINED — deterministic money semantics, dependency validation/snapshots |
+| Policies | Policy API/source concept | REFINED — separate from Variables/Settings |
+| Notifications | In-app notification/announcement surfaces | REFINED — event-driven + EmailService/push where justified |
+| Reports | Report surfaces/export concepts | REFINED — server-authoritative PDF/CSV/XLSX when justified |
+| Audit | Audit log feature | PRESERVED/REFINED — immutable technical evidence |
+| Activity timeline | Product requirement present | REFINED — distinct human-readable stream |
+| Settings | Institution/system/security configuration | REFINED — central registry rather than scattered magic values |
+| Personalization | Theme/accent/radius/glass preferences | PRESERVED/REFINED — accessibility-safe shared tokens |
+| Search/filter | Present broadly in product/screens | REFINED — permission-aware, URL state on web |
+| Leave application | Present in legacy API/model | REMOVED from v1 core unless later explicitly accepted; unrelated to core mess scope |
+| Staff/payroll-style records | Legacy model concepts | REMOVED/DEFERRED — payroll is out of v1 scope |
+| Inventory/procurement expansion | Suggested in old conversation but explicitly excluded from v1 scope | DEFERRED |
+| OTA | Not a legacy web feature | PRESERVED from new spec — Shorebird mobile OTA channels |
+| Offline mobile | Not represented by legacy Next app | ADDED from new spec — Drift risk-classified offline model |
+
+No source feature is copied solely because it exists; every disposition is explicit.
