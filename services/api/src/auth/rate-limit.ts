@@ -77,5 +77,8 @@ export async function clearLoginFailures(
   db: D1Database,
   keyHash: string,
 ): Promise<void> {
-  await db.prepare("DELETE FROM auth_attempt_windows WHERE key_hash = ?").bind(keyHash).run();
+  await db
+    .prepare("DELETE FROM auth_attempt_windows WHERE key_hash = ?")
+    .bind(keyHash)
+    .run();
 }

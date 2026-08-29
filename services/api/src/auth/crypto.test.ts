@@ -1,10 +1,18 @@
 import { describe, expect, it } from "vitest";
 
-import { hashPassword, randomToken, sha256Text, verifyPassword } from "./crypto";
+import {
+  hashPassword,
+  randomToken,
+  sha256Text,
+  verifyPassword,
+} from "./crypto";
 
 describe("authentication crypto", () => {
   it("hashes and verifies passwords without storing plaintext", async () => {
-    const credential = await hashPassword("correct horse battery staple", 1_000);
+    const credential = await hashPassword(
+      "correct horse battery staple",
+      1_000,
+    );
     expect(credential.hash).not.toContain("correct horse");
     expect(
       await verifyPassword(

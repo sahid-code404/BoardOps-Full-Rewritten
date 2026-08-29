@@ -18,11 +18,7 @@ import {
   stateEventStatement,
 } from "./route-helpers";
 import type { AccountState } from "./types";
-import {
-  emailString,
-  passwordString,
-  requiredString,
-} from "./validation";
+import { emailString, passwordString, requiredString } from "./validation";
 
 interface VerificationRow {
   id: string;
@@ -53,12 +49,11 @@ registrationRoutes.post("/register", async (c) => {
     throw new ApiError(404, "INSTITUTION_NOT_FOUND", "Institution not found.");
   }
 
-  const duplicate = await c.env.DB
-    .prepare(
-      `SELECT id FROM users
+  const duplicate = await c.env.DB.prepare(
+    `SELECT id FROM users
        WHERE institution_id = ? AND (institution_user_id = ? OR email_normalized = ?)
        LIMIT 1`,
-    )
+  )
     .bind(institution.id, institutionUserId, emailNormalized)
     .first<{ id: string }>();
   if (duplicate) {
@@ -78,52 +73,46 @@ registrationRoutes.post("/register", async (c) => {
   const correlationId = c.get("requestId");
 
   await c.env.DB.batch([
-    c.env.DB
-      .prepare(
-        `INSERT INTO users
+    c.env.DB.prepare(
+      `INSERT INTO users
          (id, institution_id, institution_user_id, email, email_normalized,
           display_name, account_state, created_at_ms, updated_at_ms)
          VALUES (?, ?, ?, ?, ?, ?, 'PENDING_EMAIL_VERIFICATION', ?, ?)`,
-      )
-      .bind(
-        userId,
-        institution.id,
-        institutionUserId,
-        email,
-        emailNormalized,
-        displayName,
-        now,
-        now,
-      ),
-    c.env.DB
-      .prepare(
-        `INSERT INTO password_credentials
+    ).bind(
+      userId,
+      institution.id,
+      institutionUserId,
+      email,
+      emailNormalized,
+      displayName,
+      now,
+      now,
+    ),
+    c.env.DB.prepare(
+      `INSERT INTO password_credentials
          (user_id, algorithm, password_hash, password_salt, password_iterations,
           password_changed_at_ms, updated_at_ms)
          VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      )
-      .bind(
-        userId,
-        PASSWORD_ALGORITHM,
-        credential.hash,
-        credential.salt,
-        credential.iterations,
-        now,
-        now,
-      ),
-    c.env.DB
-      .prepare(
-        `INSERT INTO email_verification_tokens
+    ).bind(
+      userId,
+      PASSWORD_ALGORITHM,
+      credential.hash,
+      credential.salt,
+      credential.iterations,
+      now,
+      now,
+    ),
+    c.env.DB.prepare(
+      `INSERT INTO email_verification_tokens
          (id, user_id, token_hash, created_at_ms, expires_at_ms)
          VALUES (?, ?, ?, ?, ?)`,
-      )
-      .bind(
-        verificationId,
-        userId,
-        verificationHash,
-        now,
-        now + 24 * 60 * 60 * 1000,
-      ),
+    ).bind(
+      verificationId,
+      userId,
+      verificationHash,
+      now,
+      now + 24 * 60 * 60 * 1000,
+    ),
     stateEventStatement(c.env.DB, {
       institutionId: institution.id,
       userId,
@@ -179,14 +168,13 @@ registrationRoutes.post("/verify-email", async (c) => {
   const token = requiredString(body, "token", 16, 256);
   const tokenHash = await sha256Text(token);
   const now = Date.now();
-  const row = await c.env.DB
-    .prepare(
-      `SELECT evt.id, evt.user_id, u.institution_id, u.account_state,
+  const row = await c.env.DB.prepare(
+    `SELECT evt.id, evt.user_id, u.institution_id, u.account_state,
               evt.expires_at_ms, evt.consumed_at_ms
        FROM email_verification_tokens evt
        JOIN users u ON u.id = evt.user_id
        WHERE evt.token_hash = ?`,
-    )
+  )
     .bind(tokenHash)
     .first<VerificationRow>();
 
@@ -207,19 +195,15 @@ registrationRoutes.post("/verify-email", async (c) => {
 
   const correlationId = c.get("requestId");
   await c.env.DB.batch([
-    c.env.DB
-      .prepare(
-        "UPDATE email_verification_tokens SET consumed_at_ms = ? WHERE id = ?",
-      )
-      .bind(now, row.id),
-    c.env.DB
-      .prepare(
-        `UPDATE users
+    c.env.DB.prepare(
+      "UPDATE email_verification_tokens SET consumed_at_ms = ? WHERE id = ?",
+    ).bind(now, row.id),
+    c.env.DB.prepare(
+      `UPDATE users
          SET account_state = 'PENDING_REVIEW', email_verified_at_ms = ?,
              updated_at_ms = ?, version = version + 1
          WHERE id = ? AND account_state = 'PENDING_EMAIL_VERIFICATION'`,
-      )
-      .bind(now, now, row.user_id),
+    ).bind(now, now, row.user_id),
     stateEventStatement(c.env.DB, {
       institutionId: row.institution_id,
       userId: row.user_id,

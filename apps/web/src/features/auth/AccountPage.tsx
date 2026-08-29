@@ -14,7 +14,9 @@ type Registration = Record<string, unknown> & {
 };
 
 function messageForError(error: unknown): string {
-  return error instanceof WebApiError ? error.message : "Unable to load account data.";
+  return error instanceof WebApiError
+    ? error.message
+    : "Unable to load account data.";
 }
 
 export function AccountPage() {
@@ -60,11 +62,13 @@ export function AccountPage() {
     const reason =
       action === "APPROVE"
         ? undefined
-        : window.prompt(
-            action === "REJECT"
-              ? "Reason for rejection"
-              : "What changes are required?",
-          )?.trim();
+        : window
+            .prompt(
+              action === "REJECT"
+                ? "Reason for rejection"
+                : "What changes are required?",
+            )
+            ?.trim();
     if (action !== "APPROVE" && !reason) return;
 
     setBusyId(registration.id);
@@ -83,7 +87,9 @@ export function AccountPage() {
   if (!me) {
     return (
       <main className="auth-page">
-        <GlassSurface className="account-loading">Loading secure account…</GlassSurface>
+        <GlassSurface className="account-loading">
+          Loading secure account…
+        </GlassSurface>
       </main>
     );
   }
@@ -119,10 +125,15 @@ export function AccountPage() {
 
           <GlassSurface className="showcase-card">
             <span className="section-label">Account lifecycle</span>
-            <h2>{active ? "Ready for authorized work" : "Limited while review is incomplete"}</h2>
+            <h2>
+              {active
+                ? "Ready for authorized work"
+                : "Limited while review is incomplete"}
+            </h2>
             <p>
-              Authentication and authorization are separate. Signing in proves identity;
-              permissions and account state decide what the backend allows.
+              Authentication and authorization are separate. Signing in proves
+              identity; permissions and account state decide what the backend
+              allows.
             </p>
             <div className="permission-cloud">
               {me.user.permissions.length ? (
@@ -153,9 +164,12 @@ export function AccountPage() {
                 {registrations.map((registration) => (
                   <article className="registration-row" key={registration.id}>
                     <div>
-                      <strong>{registration.display_name ?? "Unnamed resident"}</strong>
+                      <strong>
+                        {registration.display_name ?? "Unnamed resident"}
+                      </strong>
                       <span>
-                        {registration.institution_user_id} · {registration.email}
+                        {registration.institution_user_id} ·{" "}
+                        {registration.email}
                       </span>
                     </div>
                     <div className="registration-row__actions">
@@ -183,12 +197,18 @@ export function AccountPage() {
                 ))}
               </div>
             ) : (
-              <p className="empty-copy">No registrations need review right now.</p>
+              <p className="empty-copy">
+                No registrations need review right now.
+              </p>
             )}
           </GlassSurface>
         ) : null}
 
-        {message ? <p className="auth-message" role="status">{message}</p> : null}
+        {message ? (
+          <p className="auth-message" role="status">
+            {message}
+          </p>
+        ) : null}
       </section>
     </main>
   );

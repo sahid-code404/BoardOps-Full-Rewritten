@@ -79,9 +79,8 @@ export async function resolvePrincipal(
 
   const tokenHash = await sha256Text(token);
   const now = Date.now();
-  const row = await c.env.DB
-    .prepare(
-      `SELECT
+  const row = await c.env.DB.prepare(
+    `SELECT
          s.id AS session_id,
          s.user_id,
          u.institution_id,
@@ -98,14 +97,13 @@ export async function resolvePrincipal(
        WHERE s.token_hash = ?
          AND s.revoked_at_ms IS NULL
          AND s.expires_at_ms > ?`,
-    )
+  )
     .bind(tokenHash, now)
     .first<SessionRow>();
 
   if (!row) return null;
 
-  await c.env.DB
-    .prepare("UPDATE sessions SET last_seen_at_ms = ? WHERE id = ?")
+  await c.env.DB.prepare("UPDATE sessions SET last_seen_at_ms = ? WHERE id = ?")
     .bind(now, row.session_id)
     .run();
 
@@ -133,7 +131,9 @@ export const requireAuth: MiddlewareHandler<AppEnv> = async (c, next) => {
   await next();
 };
 
-export function requirePermission(permission: string): MiddlewareHandler<AppEnv> {
+export function requirePermission(
+  permission: string,
+): MiddlewareHandler<AppEnv> {
   return async (c, next) => {
     const principal = c.get("auth") ?? (await resolvePrincipal(c));
     if (!principal) {
@@ -174,13 +174,12 @@ export async function createSession(
   const ipHash = await sha256Text(ip);
   const userAgent = c.req.header("user-agent")?.slice(0, 512) ?? null;
 
-  await c.env.DB
-    .prepare(
-      `INSERT INTO sessions
+  await c.env.DB.prepare(
+    `INSERT INTO sessions
        (id, user_id, token_hash, client_type, device_name, user_agent, ip_hash,
         created_at_ms, last_seen_at_ms, expires_at_ms)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    )
+  )
     .bind(
       sessionId,
       userId,

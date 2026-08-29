@@ -5,7 +5,11 @@ const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/u;
 
 export function objectBody(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
-    throw new ApiError(422, "VALIDATION_ERROR", "Request body must be a JSON object.");
+    throw new ApiError(
+      422,
+      "VALIDATION_ERROR",
+      "Request body must be a JSON object.",
+    );
   }
   return value as Record<string, unknown>;
 }
@@ -52,10 +56,17 @@ export function optionalString(
   return trimmed;
 }
 
-export function emailString(body: Record<string, unknown>, key = "email"): string {
+export function emailString(
+  body: Record<string, unknown>,
+  key = "email",
+): string {
   const value = requiredString(body, key, 3, 254);
   if (!emailPattern.test(value)) {
-    throw new ApiError(422, "VALIDATION_ERROR", `${key} must be a valid email address.`);
+    throw new ApiError(
+      422,
+      "VALIDATION_ERROR",
+      `${key} must be a valid email address.`,
+    );
   }
   return value;
 }
@@ -72,7 +83,11 @@ export function clientType(body: Record<string, unknown>): ClientType {
   const value = body.clientType;
   if (value === undefined) return "WEB";
   if (value !== "WEB" && value !== "MOBILE") {
-    throw new ApiError(422, "VALIDATION_ERROR", "clientType must be WEB or MOBILE.");
+    throw new ApiError(
+      422,
+      "VALIDATION_ERROR",
+      "clientType must be WEB or MOBILE.",
+    );
   }
   return value;
 }
@@ -81,7 +96,11 @@ export function reviewAction(
   body: Record<string, unknown>,
 ): "APPROVE" | "REJECT" | "REQUEST_CHANGES" {
   const value = body.action;
-  if (value === "APPROVE" || value === "REJECT" || value === "REQUEST_CHANGES") {
+  if (
+    value === "APPROVE" ||
+    value === "REJECT" ||
+    value === "REQUEST_CHANGES"
+  ) {
     return value;
   }
   throw new ApiError(

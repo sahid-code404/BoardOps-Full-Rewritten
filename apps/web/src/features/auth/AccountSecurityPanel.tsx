@@ -41,7 +41,9 @@ export function AccountSecurityPanel({
   }
 
   useEffect(() => {
-    void refreshSessions().catch((error: unknown) => setMessage(errorMessage(error)));
+    void refreshSessions().catch((error: unknown) =>
+      setMessage(errorMessage(error)),
+    );
   }, []);
 
   async function requestOtp() {
@@ -102,7 +104,9 @@ export function AccountSecurityPanel({
           <h2>Devices, revocation, and step-up verification</h2>
         </div>
         <StatusChip tone={me.session.stepUpVerifiedAtMs ? "success" : "info"}>
-          {me.session.stepUpVerifiedAtMs ? "STEP-UP VERIFIED" : "SESSION ACTIVE"}
+          {me.session.stepUpVerifiedAtMs
+            ? "STEP-UP VERIFIED"
+            : "SESSION ACTIVE"}
         </StatusChip>
       </div>
       <p className="empty-copy">
@@ -125,7 +129,11 @@ export function AccountSecurityPanel({
                 onChange={(event) => setOtpCode(event.target.value)}
               />
             </label>
-            <BoardOpsButton disabled={busy || otpCode.length !== 6} tone="primary" onClick={verifyOtp}>
+            <BoardOpsButton
+              disabled={busy || otpCode.length !== 6}
+              tone="primary"
+              onClick={verifyOtp}
+            >
               Verify code
             </BoardOpsButton>
           </>
@@ -157,7 +165,10 @@ export function AccountSecurityPanel({
               {session.revoked_at_ms ? (
                 <StatusChip tone="danger">REVOKED</StatusChip>
               ) : (
-                <BoardOpsButton disabled={busy} onClick={() => revoke(session.id)}>
+                <BoardOpsButton
+                  disabled={busy}
+                  onClick={() => revoke(session.id)}
+                >
                   Revoke
                 </BoardOpsButton>
               )}

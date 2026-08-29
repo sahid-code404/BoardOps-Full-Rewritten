@@ -36,15 +36,14 @@ passwordResetRoutes.post("/password-reset/request", async (c) => {
     80,
   ).toLowerCase();
   const identifier = requiredString(body, "identifier", 2, 254);
-  const user = await c.env.DB
-    .prepare(
-      `SELECT u.id, u.institution_id, u.email
+  const user = await c.env.DB.prepare(
+    `SELECT u.id, u.institution_id, u.email
        FROM users u
        JOIN institutions i ON i.id = u.institution_id
        WHERE i.slug = ?
          AND (u.email_normalized = ? OR u.institution_user_id = ?)
        LIMIT 1`,
-    )
+  )
     .bind(institutionSlug, normalizeEmail(identifier), identifier.trim())
     .first<{ id: string; institution_id: string; email: string }>();
 
@@ -57,13 +56,11 @@ passwordResetRoutes.post("/password-reset/request", async (c) => {
     const expiresAtMs = now + 30 * 60 * 1000;
 
     await c.env.DB.batch([
-      c.env.DB
-        .prepare(
-          `INSERT INTO password_reset_tokens
+      c.env.DB.prepare(
+        `INSERT INTO password_reset_tokens
            (id, user_id, token_hash, created_at_ms, expires_at_ms)
            VALUES (?, ?, ?, ?, ?)`,
-        )
-        .bind(crypto.randomUUID(), user.id, tokenHash, now, expiresAtMs),
+      ).bind(crypto.randomUUID(), user.id, tokenHash, now, expiresAtMs),
       outboxStatement(c.env.DB, {
         institutionId: user.institution_id,
         eventType: "auth.password_reset.requested",
@@ -105,14 +102,13 @@ passwordResetRoutes.post("/password-reset/confirm", async (c) => {
   const newPassword = passwordString(body, "newPassword");
   const tokenHash = await sha256Text(token);
   const now = Date.now();
-  const reset = await c.env.DB
-    .prepare(
-      `SELECT prt.id, prt.user_id, u.institution_id,
+  const reset = await c.env.DB.prepare(
+    `SELECT prt.id, prt.user_id, u.institution_id,
               prt.expires_at_ms, prt.consumed_at_ms
        FROM password_reset_tokens prt
        JOIN users u ON u.id = prt.user_id
        WHERE prt.token_hash = ?`,
-    )
+  )
     .bind(tokenHash)
     .first<ResetRow>();
 
@@ -127,35 +123,29 @@ passwordResetRoutes.post("/password-reset/confirm", async (c) => {
   const credential = await hashPassword(newPassword);
   const correlationId = c.get("requestId");
   await c.env.DB.batch([
-    c.env.DB
-      .prepare(
-        `UPDATE password_credentials
+    c.env.DB.prepare(
+      `UPDATE password_credentials
          SET algorithm = ?, password_hash = ?, password_salt = ?,
              password_iterations = ?, failed_login_count = 0,
              locked_until_ms = NULL, password_changed_at_ms = ?, updated_at_ms = ?
          WHERE user_id = ?`,
-      )
-      .bind(
-        PASSWORD_ALGORITHM,
-        credential.hash,
-        credential.salt,
-        credential.iterations,
-        now,
-        now,
-        reset.user_id,
-      ),
-    c.env.DB
-      .prepare(
-        "UPDATE password_reset_tokens SET consumed_at_ms = ? WHERE id = ?",
-      )
-      .bind(now, reset.id),
-    c.env.DB
-      .prepare(
-        `UPDATE sessions
+    ).bind(
+      PASSWORD_ALGORITHM,
+      credential.hash,
+      credential.salt,
+      credential.iterations,
+      now,
+      now,
+      reset.user_id,
+    ),
+    c.env.DB.prepare(
+      "UPDATE password_reset_tokens SET consumed_at_ms = ? WHERE id = ?",
+    ).bind(now, reset.id),
+    c.env.DB.prepare(
+      `UPDATE sessions
          SET revoked_at_ms = ?, revoked_reason = 'PASSWORD_RESET'
          WHERE user_id = ? AND revoked_at_ms IS NULL`,
-      )
-      .bind(now, reset.user_id),
+    ).bind(now, reset.user_id),
     auditStatement(c.env.DB, {
       institutionId: reset.institution_id,
       actorRef: reset.user_id,

@@ -35,7 +35,8 @@ interface OtpChallengeRow {
 }
 
 function otpPurpose(body: Record<string, unknown>): typeof OTP_PURPOSE_STEP_UP {
-  const value = optionalString(body, "purpose", 32)?.toUpperCase() ?? OTP_PURPOSE_STEP_UP;
+  const value =
+    optionalString(body, "purpose", 32)?.toUpperCase() ?? OTP_PURPOSE_STEP_UP;
   if (value !== OTP_PURPOSE_STEP_UP) {
     throw new ApiError(
       422,
@@ -62,12 +63,11 @@ otpRoutes.post("/otp/request", requireAuth, async (c) => {
   const purpose = otpPurpose(body);
   const now = Date.now();
   const windowStart = now - OTP_REQUEST_WINDOW_MS;
-  const recent = await c.env.DB
-    .prepare(
-      `SELECT COUNT(*) AS count
+  const recent = await c.env.DB.prepare(
+    `SELECT COUNT(*) AS count
        FROM otp_challenges
        WHERE user_id = ? AND purpose = ? AND created_at_ms >= ?`,
-    )
+  )
     .bind(principal.userId, purpose, windowStart)
     .first<{ count: number }>();
 
@@ -86,29 +86,25 @@ otpRoutes.post("/otp/request", requireAuth, async (c) => {
   const correlationId = c.get("requestId");
 
   await c.env.DB.batch([
-    c.env.DB
-      .prepare(
-        `UPDATE otp_challenges
+    c.env.DB.prepare(
+      `UPDATE otp_challenges
          SET consumed_at_ms = ?
          WHERE user_id = ? AND purpose = ? AND consumed_at_ms IS NULL`,
-      )
-      .bind(now, principal.userId, purpose),
-    c.env.DB
-      .prepare(
-        `INSERT INTO otp_challenges
+    ).bind(now, principal.userId, purpose),
+    c.env.DB.prepare(
+      `INSERT INTO otp_challenges
          (id, user_id, purpose, code_hash, attempt_count, max_attempts,
           created_at_ms, expires_at_ms, consumed_at_ms)
          VALUES (?, ?, ?, ?, 0, ?, ?, ?, NULL)`,
-      )
-      .bind(
-        challengeId,
-        principal.userId,
-        purpose,
-        codeHash,
-        OTP_MAX_ATTEMPTS,
-        now,
-        expiresAtMs,
-      ),
+    ).bind(
+      challengeId,
+      principal.userId,
+      purpose,
+      codeHash,
+      OTP_MAX_ATTEMPTS,
+      now,
+      expiresAtMs,
+    ),
     outboxStatement(c.env.DB, {
       institutionId: principal.institutionId,
       eventType: "auth.otp.requested",
@@ -152,16 +148,19 @@ otpRoutes.post("/otp/verify", requireAuth, async (c) => {
   const challengeId = requiredString(body, "challengeId", 16, 80);
   const code = requiredString(body, "code", 6, 6);
   if (!isValidOtpCode(code)) {
-    throw new ApiError(422, "VALIDATION_ERROR", "code must contain exactly six digits.");
+    throw new ApiError(
+      422,
+      "VALIDATION_ERROR",
+      "code must contain exactly six digits.",
+    );
   }
 
-  const row = await c.env.DB
-    .prepare(
-      `SELECT id, user_id, purpose, code_hash, attempt_count, max_attempts,
+  const row = await c.env.DB.prepare(
+    `SELECT id, user_id, purpose, code_hash, attempt_count, max_attempts,
               expires_at_ms, consumed_at_ms
        FROM otp_challenges
        WHERE id = ? AND user_id = ?`,
-    )
+  )
     .bind(challengeId, principal.userId)
     .first<OtpChallengeRow>();
 
@@ -170,14 +169,23 @@ otpRoutes.post("/otp/verify", requireAuth, async (c) => {
     throw new ApiError(422, "OTP_INVALID", "The verification code is invalid.");
   }
   if (row.consumed_at_ms !== null) {
-    throw new ApiError(422, "OTP_ALREADY_USED", "The verification code is no longer usable.");
+    throw new ApiError(
+      422,
+      "OTP_ALREADY_USED",
+      "The verification code is no longer usable.",
+    );
   }
   if (row.expires_at_ms <= now) {
-    await c.env.DB
-      .prepare("UPDATE otp_challenges SET consumed_at_ms = ? WHERE id = ?")
+    await c.env.DB.prepare(
+      "UPDATE otp_challenges SET consumed_at_ms = ? WHERE id = ?",
+    )
       .bind(now, row.id)
       .run();
-    throw new ApiError(422, "OTP_EXPIRED", "The verification code has expired.");
+    throw new ApiError(
+      422,
+      "OTP_EXPIRED",
+      "The verification code has expired.",
+    );
   }
   if (row.attempt_count >= row.max_attempts) {
     throw new ApiError(
@@ -193,13 +201,11 @@ otpRoutes.post("/otp/verify", requireAuth, async (c) => {
     const nextAttemptCount = row.attempt_count + 1;
     const exhausted = nextAttemptCount >= row.max_attempts;
     await c.env.DB.batch([
-      c.env.DB
-        .prepare(
-          `UPDATE otp_challenges
+      c.env.DB.prepare(
+        `UPDATE otp_challenges
            SET attempt_count = ?, consumed_at_ms = CASE WHEN ? THEN ? ELSE consumed_at_ms END
            WHERE id = ? AND consumed_at_ms IS NULL`,
-        )
-        .bind(nextAttemptCount, exhausted ? 1 : 0, now, row.id),
+      ).bind(nextAttemptCount, exhausted ? 1 : 0, now, row.id),
       auditStatement(c.env.DB, {
         institutionId: principal.institutionId,
         actorRef: principal.userId,
@@ -223,20 +229,16 @@ otpRoutes.post("/otp/verify", requireAuth, async (c) => {
   }
 
   await c.env.DB.batch([
-    c.env.DB
-      .prepare(
-        `UPDATE otp_challenges
+    c.env.DB.prepare(
+      `UPDATE otp_challenges
          SET consumed_at_ms = ?
          WHERE id = ? AND consumed_at_ms IS NULL`,
-      )
-      .bind(now, row.id),
-    c.env.DB
-      .prepare(
-        `UPDATE sessions
+    ).bind(now, row.id),
+    c.env.DB.prepare(
+      `UPDATE sessions
          SET step_up_verified_at_ms = ?
          WHERE id = ? AND user_id = ? AND revoked_at_ms IS NULL`,
-      )
-      .bind(now, principal.sessionId, principal.userId),
+    ).bind(now, principal.sessionId, principal.userId),
     auditStatement(c.env.DB, {
       institutionId: principal.institutionId,
       actorRef: principal.userId,

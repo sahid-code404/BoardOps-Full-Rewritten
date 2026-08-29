@@ -8,16 +8,8 @@ import {
   clearLoginFailures,
   recordLoginFailure,
 } from "./rate-limit";
-import {
-  auditStatement,
-  currentPrincipal,
-  readJson,
-} from "./route-helpers";
-import {
-  clearSessionCookie,
-  createSession,
-  requireAuth,
-} from "./session";
+import { auditStatement, currentPrincipal, readJson } from "./route-helpers";
+import { clearSessionCookie, createSession, requireAuth } from "./session";
 import type { AuthUserRow } from "./types";
 import {
   clientType,
@@ -49,9 +41,8 @@ sessionRoutes.post("/login", async (c) => {
   );
   await assertLoginAllowed(c.env.DB, throttleKey);
 
-  const user = await c.env.DB
-    .prepare(
-      `SELECT
+  const user = await c.env.DB.prepare(
+    `SELECT
          u.id,
          u.institution_id,
          i.slug AS institution_slug,
@@ -70,7 +61,7 @@ sessionRoutes.post("/login", async (c) => {
        WHERE i.slug = ?
          AND (u.email_normalized = ? OR u.institution_user_id = ?)
        LIMIT 1`,
-    )
+  )
     .bind(institutionSlug, normalizeEmail(identifier), identifier.trim())
     .first<AuthUserRow>();
 
@@ -92,11 +83,7 @@ sessionRoutes.post("/login", async (c) => {
     );
   }
   if (user.locked_until_ms && user.locked_until_ms > Date.now()) {
-    throw new ApiError(
-      429,
-      "ACCOUNT_TEMPORARILY_LOCKED",
-      "Try again later.",
-    );
+    throw new ApiError(429, "ACCOUNT_TEMPORARILY_LOCKED", "Try again later.");
   }
   if (user.account_state === "ARCHIVED") {
     throw new ApiError(403, "ACCOUNT_ARCHIVED", "This account is archived.");
@@ -112,13 +99,11 @@ sessionRoutes.post("/login", async (c) => {
   const correlationId = c.get("requestId");
   const now = Date.now();
   await c.env.DB.batch([
-    c.env.DB
-      .prepare(
-        `UPDATE password_credentials
+    c.env.DB.prepare(
+      `UPDATE password_credentials
          SET failed_login_count = 0, locked_until_ms = NULL, updated_at_ms = ?
          WHERE user_id = ?`,
-      )
-      .bind(now, user.id),
+    ).bind(now, user.id),
     auditStatement(c.env.DB, {
       institutionId: user.institution_id,
       actorRef: user.id,
@@ -175,11 +160,10 @@ sessionRoutes.get("/me", requireAuth, (c) => {
 sessionRoutes.post("/logout", requireAuth, async (c) => {
   const principal = currentPrincipal(c);
   const now = Date.now();
-  await c.env.DB
-    .prepare(
-      `UPDATE sessions SET revoked_at_ms = ?, revoked_reason = 'USER_LOGOUT'
+  await c.env.DB.prepare(
+    `UPDATE sessions SET revoked_at_ms = ?, revoked_reason = 'USER_LOGOUT'
        WHERE id = ? AND revoked_at_ms IS NULL`,
-    )
+  )
     .bind(now, principal.sessionId)
     .run();
   clearSessionCookie(c);
@@ -188,15 +172,14 @@ sessionRoutes.post("/logout", requireAuth, async (c) => {
 
 sessionRoutes.get("/sessions", requireAuth, async (c) => {
   const principal = currentPrincipal(c);
-  const rows = await c.env.DB
-    .prepare(
-      `SELECT id, client_type, device_name, user_agent, created_at_ms,
+  const rows = await c.env.DB.prepare(
+    `SELECT id, client_type, device_name, user_agent, created_at_ms,
               last_seen_at_ms, expires_at_ms, revoked_at_ms, step_up_verified_at_ms
        FROM sessions
        WHERE user_id = ?
        ORDER BY created_at_ms DESC
        LIMIT 50`,
-    )
+  )
     .bind(principal.userId)
     .all();
   return c.json({ sessions: rows.results, requestId: c.get("requestId") });
@@ -206,12 +189,11 @@ sessionRoutes.delete("/sessions/:sessionId", requireAuth, async (c) => {
   const principal = currentPrincipal(c);
   const sessionId = c.req.param("sessionId");
   const now = Date.now();
-  const result = await c.env.DB
-    .prepare(
-      `UPDATE sessions
+  const result = await c.env.DB.prepare(
+    `UPDATE sessions
        SET revoked_at_ms = ?, revoked_reason = 'USER_REVOKED'
        WHERE id = ? AND user_id = ? AND revoked_at_ms IS NULL`,
-    )
+  )
     .bind(now, sessionId, principal.userId)
     .run();
   if (result.meta.changes === 0) {

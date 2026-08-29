@@ -99,10 +99,13 @@ export function AuthPage() {
           <h1 id="auth-title">Institution identity, protected by default.</h1>
           <p>
             Registration, email verification, administrator review, recovery,
-            revocable sessions, and step-up security share one institution-scoped
-            authentication model.
+            revocable sessions, and step-up security share one
+            institution-scoped authentication model.
           </p>
-          <div className="auth-principles" aria-label="Authentication principles">
+          <div
+            className="auth-principles"
+            aria-label="Authentication principles"
+          >
             <span>Institution User ID</span>
             <span>HttpOnly web session</span>
             <span>Account approval</span>
@@ -112,7 +115,11 @@ export function AuthPage() {
 
         <GlassSurface className="auth-card" strength="strong">
           {mode !== "reset" ? (
-            <div className="auth-tabs" role="tablist" aria-label="Authentication mode">
+            <div
+              className="auth-tabs"
+              role="tablist"
+              aria-label="Authentication mode"
+            >
               <BoardOpsButton
                 aria-selected={mode === "login"}
                 role="tab"
@@ -187,19 +194,38 @@ export function AuthPage() {
               </div>
               <label>
                 Institution
-                <input value={institutionSlug} onChange={(event) => setInstitutionSlug(event.target.value)} required />
+                <input
+                  value={institutionSlug}
+                  onChange={(event) => setInstitutionSlug(event.target.value)}
+                  required
+                />
               </label>
               <label>
                 Institution User ID
-                <input value={institutionUserId} onChange={(event) => setInstitutionUserId(event.target.value)} required />
+                <input
+                  value={institutionUserId}
+                  onChange={(event) => setInstitutionUserId(event.target.value)}
+                  required
+                />
               </label>
               <label>
                 Full name
-                <input autoComplete="name" value={displayName} onChange={(event) => setDisplayName(event.target.value)} required />
+                <input
+                  autoComplete="name"
+                  value={displayName}
+                  onChange={(event) => setDisplayName(event.target.value)}
+                  required
+                />
               </label>
               <label>
                 Email
-                <input autoComplete="email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
+                <input
+                  autoComplete="email"
+                  type="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  required
+                />
               </label>
               <label>
                 Password
@@ -209,7 +235,9 @@ export function AuthPage() {
                   maxLength={128}
                   type="password"
                   value={registrationPassword}
-                  onChange={(event) => setRegistrationPassword(event.target.value)}
+                  onChange={(event) =>
+                    setRegistrationPassword(event.target.value)
+                  }
                   required
                 />
               </label>

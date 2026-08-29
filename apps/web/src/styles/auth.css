@@ -3,14 +3,21 @@
   min-height: 100vh;
   overflow: hidden;
   isolation: isolate;
-  padding:
-    max(var(--bo-space-xl), env(safe-area-inset-top))
+  padding: max(var(--bo-space-xl), env(safe-area-inset-top))
     max(var(--bo-space-xl), env(safe-area-inset-right))
     max(var(--bo-space-xl), env(safe-area-inset-bottom))
     max(var(--bo-space-xl), env(safe-area-inset-left));
   background:
-    radial-gradient(circle at 12% 12%, color-mix(in srgb, var(--bo-color-primary) 22%, transparent), transparent 34%),
-    radial-gradient(circle at 88% 82%, color-mix(in srgb, var(--bo-color-accent) 15%, transparent), transparent 38%),
+    radial-gradient(
+      circle at 12% 12%,
+      color-mix(in srgb, var(--bo-color-primary) 22%, transparent),
+      transparent 34%
+    ),
+    radial-gradient(
+      circle at 88% 82%,
+      color-mix(in srgb, var(--bo-color-accent) 15%, transparent),
+      transparent 38%
+    ),
     var(--bo-color-background);
 }
 
@@ -78,7 +85,11 @@
   margin-bottom: var(--bo-space-xl);
   padding: var(--bo-space-xs);
   border-radius: var(--bo-radius-pill);
-  background: color-mix(in srgb, var(--bo-color-surface-muted) 70%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--bo-color-surface-muted) 70%,
+    transparent
+  );
 }
 
 .auth-tabs .bo-button {
@@ -123,7 +134,8 @@
 .auth-form input:focus,
 .security-code-field input:focus {
   border-color: var(--bo-color-primary);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--bo-color-primary) 16%, transparent);
+  box-shadow: 0 0 0 4px
+    color-mix(in srgb, var(--bo-color-primary) 16%, transparent);
 }
 
 .auth-demo-link {
@@ -306,8 +318,7 @@
 
 @media (max-width: 600px) {
   .auth-page {
-    padding:
-      max(var(--bo-space-lg), env(safe-area-inset-top))
+    padding: max(var(--bo-space-lg), env(safe-area-inset-top))
       max(var(--bo-space-lg), env(safe-area-inset-right))
       max(var(--bo-space-lg), env(safe-area-inset-bottom))
       max(var(--bo-space-lg), env(safe-area-inset-left));

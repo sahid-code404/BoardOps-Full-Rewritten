@@ -19,16 +19,15 @@ reviewRoutes.get(
   requirePermission("resident.approve"),
   async (c) => {
     const principal = currentPrincipal(c);
-    const rows = await c.env.DB
-      .prepare(
-        `SELECT id, institution_user_id, email, display_name, account_state,
+    const rows = await c.env.DB.prepare(
+      `SELECT id, institution_user_id, email, display_name, account_state,
                 email_verified_at_ms, created_at_ms, updated_at_ms
          FROM users
          WHERE institution_id = ?
            AND account_state IN ('PENDING_REVIEW', 'CHANGES_REQUESTED')
          ORDER BY created_at_ms ASC
          LIMIT 100`,
-      )
+    )
       .bind(principal.institutionId)
       .all();
 
@@ -56,11 +55,10 @@ reviewRoutes.post(
     }
 
     const userId = c.req.param("userId");
-    const target = await c.env.DB
-      .prepare(
-        `SELECT id, institution_id, account_state
+    const target = await c.env.DB.prepare(
+      `SELECT id, institution_id, account_state
          FROM users WHERE id = ? AND institution_id = ?`,
-      )
+    )
       .bind(userId, principal.institutionId)
       .first<{
         id: string;
@@ -87,14 +85,12 @@ reviewRoutes.post(
     const correlationId = c.get("requestId");
     if (action === "APPROVE") {
       await c.env.DB.batch([
-        c.env.DB
-          .prepare(
-            `UPDATE users
+        c.env.DB.prepare(
+          `UPDATE users
              SET account_state = 'ACTIVE', approved_at_ms = ?, approved_by_user_id = ?,
                  updated_at_ms = ?, version = version + 1
              WHERE id = ? AND account_state = 'PENDING_REVIEW'`,
-          )
-          .bind(now, principal.userId, now, userId),
+        ).bind(now, principal.userId, now, userId),
         stateEventStatement(c.env.DB, {
           institutionId: target.institution_id,
           userId,
@@ -134,13 +130,11 @@ reviewRoutes.post(
       action === "REQUEST_CHANGES" ? "CHANGES_REQUESTED" : "REJECTED";
 
     await c.env.DB.batch([
-      c.env.DB
-        .prepare(
-          `UPDATE users
+      c.env.DB.prepare(
+        `UPDATE users
            SET account_state = ?, updated_at_ms = ?, version = version + 1
            WHERE id = ? AND account_state = 'PENDING_REVIEW'`,
-        )
-        .bind(nextState, now, userId),
+      ).bind(nextState, now, userId),
       stateEventStatement(c.env.DB, {
         institutionId: target.institution_id,
         userId,
@@ -166,6 +160,9 @@ reviewRoutes.post(
       }),
     ]);
 
-    return c.json({ status: nextState.toLowerCase(), requestId: correlationId });
+    return c.json({
+      status: nextState.toLowerCase(),
+      requestId: correlationId,
+    });
   },
 );
