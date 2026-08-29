@@ -24,10 +24,27 @@ Replace role-name authorization assumptions with one institution-scoped permissi
 - **REFINED — role administration:** useful role concepts are preserved while role membership and role permissions become institution-scoped, reasoned, audited, and step-up protected.
 - **REFINED — per-user access:** direct ALLOW/DENY overrides are supported with deterministic DENY precedence and effective-access visibility.
 - **PRESERVED/REFINED — resident approval:** the existing approval capability remains, but its authorization now consumes the canonical `resident.approve` permission guard.
-- **REFINED — Web administration UX:** access administration is exposed through the shared BoardOps design language rather than legacy framework code.
+- **REFINED — Web administration UX:** access administration is exposed through the shared BoardOps design language without copying the legacy framework implementation.
 - **DEFERRED — destructive role deletion and break-glass recovery:** both require explicit lifecycle/recovery policy before implementation.
 
 Nothing in this phase silently removes the accepted permission-related behavior from the product baseline.
+
+## Reference visual parity correction
+
+Human review found that the first rewrite presentation preserved the purple/graphite/glass palette but drifted too far from the accepted reference composition. This was treated as a parity defect rather than a new visual direction.
+
+The audited reference commit `77f3dec3b264c42904207f27c5f008b33c03b868` was re-read specifically for presentation behavior. The relevant reference sources establish these visual rules:
+
+- authentication is a centered `max-w-md` strong glass card, not a large marketing split-screen;
+- the BoardOps mark and `Operations Suite` label live inside the authentication card;
+- Sign in/Register uses a compact segmented glass navigation surface;
+- forms use dense rounded glass inputs and rounded rectangular actions;
+- the authenticated workspace uses a compact `max-w-6xl` glass chrome and dense cards rather than oversized landing-page typography;
+- animated purple/blue/pink mesh ambience remains background treatment, not the primary content hierarchy.
+
+Phase 05 therefore corrects the current Web surfaces by removing the split-screen authentication hero, restoring the centered reference-style authentication composition, reducing oversized page typography, tightening card density, and making Account/Access Control surfaces use the same compact glass rhythm. This is visual/interaction refinement only; the Phase 04/05 authentication and authorization security model remains unchanged.
+
+The full reusable authenticated navigation shell, menu/search/theme/notification/profile chrome, responsive bottom navigation, and permission-aware navigation still belong to Phase 06. Those controls will not be faked in Phase 05 merely for visual similarity.
 
 ## Database changes
 
@@ -133,7 +150,7 @@ Backend authorization remains authoritative. Permission mutations are online-onl
 
 ## Verified implementation CI
 
-GitHub Actions run `33270319964` passed:
+GitHub Actions run `33270844042` passed the permission-engine implementation before the later visual-parity correction:
 
 - locked dependency installation;
 - formatting and lint;
@@ -146,21 +163,23 @@ GitHub Actions run `33270319964` passed:
 - Android debug APK build;
 - iOS no-codesign compile validation.
 
+A new exact-head CI run is required after the reference visual-parity correction before the branch returns to a runnable checkpoint.
+
 ## Local runtime checkpoint
 
-Use the commands in the repository `README.md`. The required manual checkpoint is the authenticated Web Access Control workspace at `/permissions`, plus the combined local smoke test.
+After the corrected exact head is green, use the commands in the repository `README.md`. The required manual checkpoint is the centered reference-style authentication surface and authenticated Web Access Control workspace at `/permissions`, plus the combined local smoke test.
 
 ## Known limitations / deferred work
 
 - destructive role deletion is intentionally deferred pending an explicit lifecycle/reference policy;
 - break-glass/recovery administration is deferred to security/system-administration hardening;
-- the final Web/Flutter application shell and permission-aware navigation belong to Phase 06;
+- the full Web/Flutter application shell and permission-aware navigation belong to Phase 06;
 - later domain modules still need to bind their business actions to the canonical permission codes as those routes are implemented.
 
 ## Exit criteria
 
-Phase 05 implementation gates are green. Local runtime review remains the human acceptance gate before Phase 05 is merged and Phase 06 begins.
+Phase 05 remains open until the visual-parity-corrected exact head passes formatting, lint, TypeScript, unit tests, D1 verification, auth/permission smoke, builds, Android/iOS gates, and local human review.
 
 ## Final status
 
-RUNNABLE — TEST NOW
+NOT READY — CONTINUE FIXING
