@@ -2,13 +2,14 @@ import { Hono } from "hono";
 
 import type { AppEnv } from "../app-env";
 import { ApiError } from "../http/api-error";
+import { requirePermission } from "../permissions/guards";
+import { permissionCodes } from "../permissions/permission-codes";
 import {
   auditStatement,
   currentPrincipal,
   readJson,
   stateEventStatement,
 } from "./route-helpers";
-import { requirePermission } from "./session";
 import type { AccountState } from "./types";
 import { optionalString, reviewAction } from "./validation";
 
@@ -16,7 +17,7 @@ export const reviewRoutes = new Hono<AppEnv>();
 
 reviewRoutes.get(
   "/registrations",
-  requirePermission("resident.approve"),
+  requirePermission(permissionCodes.residentApprove),
   async (c) => {
     const principal = currentPrincipal(c);
     const rows = await c.env.DB.prepare(
@@ -40,7 +41,7 @@ reviewRoutes.get(
 
 reviewRoutes.post(
   "/registrations/:userId/review",
-  requirePermission("resident.approve"),
+  requirePermission(permissionCodes.residentApprove),
   async (c) => {
     const principal = currentPrincipal(c);
     const body = await readJson(c);
