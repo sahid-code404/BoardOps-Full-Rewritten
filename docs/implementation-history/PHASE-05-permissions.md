@@ -150,7 +150,7 @@ Backend authorization remains authoritative. Permission mutations are online-onl
 
 ## Verified implementation CI
 
-GitHub Actions run `33270844042` passed the permission-engine implementation before the later visual-parity correction:
+The corrected exact head `7fd5e673ede098b1aa1040327c141351b5c6fb69` passed pull-request GitHub Actions run `33271749245` across all Phase 05 gates:
 
 - locked dependency installation;
 - formatting and lint;
@@ -163,11 +163,11 @@ GitHub Actions run `33270844042` passed the permission-engine implementation bef
 - Android debug APK build;
 - iOS no-codesign compile validation.
 
-A new exact-head CI run is required after the reference visual-parity correction before the branch returns to a runnable checkpoint.
+This run verifies the permission implementation and the later reference visual-parity correction together on the exact reviewed head.
 
 ## Local runtime checkpoint
 
-After the corrected exact head is green, use the commands in the repository `README.md`. The required manual checkpoint is the centered reference-style authentication surface and authenticated Web Access Control workspace at `/permissions`, plus the combined local smoke test.
+Use the commands in the repository `README.md`. The remaining human checkpoint is the corrected centered authentication surface plus authenticated `/account` and `/permissions` presentation, with the reference repository used as the visual baseline. The combined local authorization smoke must also remain green.
 
 ## Known limitations / deferred work
 
@@ -178,8 +178,8 @@ After the corrected exact head is green, use the commands in the repository `REA
 
 ## Exit criteria
 
-Phase 05 remains open until the visual-parity-corrected exact head passes formatting, lint, TypeScript, unit tests, D1 verification, auth/permission smoke, builds, Android/iOS gates, and local human review.
+Automated Phase 05 exit gates are green. Local human visual/interaction review is the remaining acceptance gate before PR #7 is merged and Phase 06 begins.
 
 ## Final status
 
-NOT READY — CONTINUE FIXING
+RUNNABLE — TEST NOW
