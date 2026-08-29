@@ -6,3 +6,7 @@ packages/design-tokens/web/tokens.css
 scripts/generate-design-tokens.mjs
 apps/web/src/features/foundation/FoundationPage.tsx
 apps/web/src/styles/base.css
+apps/web/src/features/permissions/**
+apps/web/src/styles/permissions.css
+scripts/permissions-smoke.mjs
+services/api/src/permissions/**
