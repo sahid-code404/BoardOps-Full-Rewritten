@@ -7,7 +7,11 @@
     "dev": "wrangler dev --port 8787",
     "build": "vite build",
     "typecheck": "wrangler types --env-interface CloudflareBindings && tsc --noEmit --pretty false",
-    "test": "vitest run --config vitest.config.ts"
+    "test": "vitest run --config vitest.config.ts",
+    "db:migrate:local": "wrangler d1 migrations apply DB --local",
+    "db:verify:local": "pnpm db:migrate:local && wrangler d1 execute DB --local --command \"SELECT name FROM sqlite_master WHERE type = 'table' AND name IN ('institutions', 'idempotency_records', 'outbox_events', 'audit_events', 'background_tasks') ORDER BY name; SELECT COUNT(*) AS audit_trigger_count FROM sqlite_master WHERE type = 'trigger' AND name IN ('audit_events_no_update', 'audit_events_no_delete'); SELECT COUNT(*) AS institution_count FROM institutions; SELECT COUNT(*) AS idempotency_count FROM idempotency_records; SELECT COUNT(*) AS outbox_count FROM outbox_events; SELECT COUNT(*) AS audit_count FROM audit_events; SELECT COUNT(*) AS background_task_count FROM background_tasks;\"",
+    "db:migrate:staging": "wrangler d1 migrations apply DB --remote --env staging",
+    "db:migrate:production": "wrangler d1 migrations apply DB --remote --env production"
   },
   "dependencies": {
     "hono": "4.13.5"

@@ -32,6 +32,8 @@ jobs:
         run: pnpm typecheck
       - name: Unit tests
         run: pnpm test
+      - name: D1 migration verification
+        run: pnpm db:verify:local
       - name: Builds
         run: pnpm build
 

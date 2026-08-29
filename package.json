@@ -10,13 +10,15 @@
     "dev": "pnpm --parallel --stream --filter @boardops/web --filter @boardops/api dev",
     "design:tokens": "node scripts/generate-design-tokens.mjs",
     "design:tokens:check": "node scripts/generate-design-tokens.mjs --check",
+    "db:migrate:local": "pnpm --filter @boardops/api db:migrate:local",
+    "db:verify:local": "pnpm --filter @boardops/api db:verify:local",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "pnpm design:tokens:check && pnpm -r --if-present test",
     "build": "pnpm -r --if-present build",
-    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build"
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm db:verify:local && pnpm build"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
