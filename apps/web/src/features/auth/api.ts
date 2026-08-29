@@ -50,7 +50,23 @@ export interface MeResponse {
     accountState: string;
     permissions: string[];
   };
-  session: { id: string; clientType: "WEB" | "MOBILE" };
+  session: {
+    id: string;
+    clientType: "WEB" | "MOBILE";
+    stepUpVerifiedAtMs: number | null;
+  };
+}
+
+export interface DeviceSession {
+  id: string;
+  client_type: "WEB" | "MOBILE";
+  device_name: string | null;
+  user_agent: string | null;
+  created_at_ms: number;
+  last_seen_at_ms: number;
+  expires_at_ms: number;
+  revoked_at_ms: number | null;
+  step_up_verified_at_ms: number | null;
 }
 
 export const authApi = {
@@ -94,21 +110,50 @@ export const authApi = {
       body: JSON.stringify({ token }),
     }),
 
+  requestPasswordReset: (input: {
+    institutionSlug: string;
+    identifier: string;
+  }) =>
+    request<{ status: string; developmentResetToken?: string }>(
+      "/auth/password-reset/request",
+      { method: "POST", body: JSON.stringify(input) },
+    ),
+
+  confirmPasswordReset: (token: string, newPassword: string) =>
+    request<{ status: string }>("/auth/password-reset/confirm", {
+      method: "POST",
+      body: JSON.stringify({ token, newPassword }),
+    }),
+
   me: () => request<MeResponse>("/auth/me"),
 
   logout: () =>
     request<{ status: string }>("/auth/logout", { method: "POST", body: "{}" }),
 
-  sessions: () =>
-    request<{ sessions: Array<Record<string, unknown>> }>("/auth/sessions"),
+  sessions: () => request<{ sessions: DeviceSession[] }>("/auth/sessions"),
 
   revokeSession: (sessionId: string) =>
     request<{ status: string }>(
       `/auth/sessions/${encodeURIComponent(sessionId)}`,
-      {
-        method: "DELETE",
-      },
+      { method: "DELETE" },
     ),
+
+  requestOtp: () =>
+    request<{
+      status: string;
+      challengeId: string;
+      expiresAtMs: number;
+      developmentOtpCode?: string;
+    }>("/auth/otp/request", {
+      method: "POST",
+      body: JSON.stringify({ purpose: "STEP_UP" }),
+    }),
+
+  verifyOtp: (challengeId: string, code: string) =>
+    request<{ status: string; verifiedAtMs: number }>("/auth/otp/verify", {
+      method: "POST",
+      body: JSON.stringify({ challengeId, code }),
+    }),
 
   registrations: () =>
     request<{ registrations: Array<Record<string, unknown>> }>(

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { BoardOpsButton, GlassSurface, StatusChip } from "../../design";
+import { AccountSecurityPanel } from "./AccountSecurityPanel";
 import { authApi, type MeResponse, WebApiError } from "./api";
 
 type Registration = Record<string, unknown> & {
@@ -30,6 +31,8 @@ export function AccountPage() {
       if (current.user.permissions.includes("resident.approve")) {
         const pending = await authApi.registrations();
         setRegistrations(pending.registrations as Registration[]);
+      } else {
+        setRegistrations([]);
       }
     } catch (error) {
       if (error instanceof WebApiError && error.status === 401) {
@@ -108,12 +111,18 @@ export function AccountPage() {
         </header>
 
         <div className="account-grid">
-          <GlassSurface className="showcase-card" strength="strong">
-            <span className="section-label">Session</span>
-            <h2>Secure web session active</h2>
+          <AccountSecurityPanel
+            me={me}
+            onCurrentSessionRevoked={() => navigate("/auth", { replace: true })}
+            onSessionChanged={refresh}
+          />
+
+          <GlassSurface className="showcase-card">
+            <span className="section-label">Account lifecycle</span>
+            <h2>{active ? "Ready for authorized work" : "Limited while review is incomplete"}</h2>
             <p>
-              The browser uses an HttpOnly session cookie. Session ID {me.session.id.slice(0, 8)}…
-              can be revoked without changing your password.
+              Authentication and authorization are separate. Signing in proves identity;
+              permissions and account state decide what the backend allows.
             </p>
             <div className="permission-cloud">
               {me.user.permissions.length ? (
@@ -124,15 +133,6 @@ export function AccountPage() {
                 <span>No active business permissions</span>
               )}
             </div>
-          </GlassSurface>
-
-          <GlassSurface className="showcase-card">
-            <span className="section-label">Account lifecycle</span>
-            <h2>{active ? "Ready for authorized work" : "Limited while review is incomplete"}</h2>
-            <p>
-              Authentication and authorization are separate. Signing in proves identity;
-              permissions and account state decide what the backend allows.
-            </p>
           </GlassSurface>
         </div>
 

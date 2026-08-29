@@ -95,7 +95,8 @@
   margin-bottom: 0;
 }
 
-.auth-form label {
+.auth-form label,
+.security-code-field {
   display: grid;
   gap: var(--bo-space-sm);
   color: var(--bo-color-foreground-muted);
@@ -103,7 +104,8 @@
   font-weight: 650;
 }
 
-.auth-form input {
+.auth-form input,
+.security-code-field input {
   width: 100%;
   min-height: 48px;
   border: 1px solid var(--bo-color-border);
@@ -118,7 +120,8 @@
     transform var(--bo-motion-fast) var(--bo-motion-ease-standard);
 }
 
-.auth-form input:focus {
+.auth-form input:focus,
+.security-code-field input:focus {
   border-color: var(--bo-color-primary);
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--bo-color-primary) 16%, transparent);
 }
@@ -135,6 +138,11 @@
 
 .auth-demo-link:hover {
   text-decoration: underline;
+}
+
+.auth-reset-panel {
+  display: grid;
+  gap: var(--bo-space-lg);
 }
 
 .auth-message {
@@ -166,7 +174,9 @@
 
 .account-header__actions,
 .registration-row__actions,
-.review-card__header {
+.review-card__header,
+.security-card__header,
+.security-actions {
   display: flex;
   align-items: center;
   gap: var(--bo-space-sm);
@@ -176,6 +186,51 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--bo-space-lg);
+}
+
+.security-card {
+  padding: clamp(22px, 4vw, 30px);
+  border-radius: var(--bo-radius-xxl);
+}
+
+.security-card__header {
+  justify-content: space-between;
+  align-items: start;
+  gap: var(--bo-space-lg);
+}
+
+.security-actions {
+  flex-wrap: wrap;
+  margin: var(--bo-space-lg) 0;
+}
+
+.security-code-field {
+  flex: 1 1 220px;
+}
+
+.security-session-list {
+  display: grid;
+  gap: var(--bo-space-sm);
+}
+
+.security-session {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--bo-space-md);
+  padding: 12px 0;
+  border-top: 1px solid var(--bo-color-border);
+}
+
+.security-session strong,
+.security-session span {
+  display: block;
+}
+
+.security-session span {
+  margin-top: 4px;
+  color: var(--bo-color-foreground-muted);
+  font-size: var(--bo-type-caption);
 }
 
 .review-card {
@@ -264,13 +319,21 @@
   }
 
   .auth-card,
-  .review-card {
+  .review-card,
+  .security-card {
     border-radius: var(--bo-radius-xl);
   }
 
   .account-header__actions,
-  .registration-row__actions {
+  .registration-row__actions,
+  .security-card__header {
     width: 100%;
+  }
+
+  .security-card__header,
+  .security-session {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .account-header__actions .bo-button,

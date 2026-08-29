@@ -9,7 +9,7 @@ void main() {
       (WidgetTester tester) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: <Override>[
+        overrides: [
           authTokenStorageProvider.overrideWithValue(MemoryAuthTokenStorage()),
         ],
         child: const BoardOpsApp(),

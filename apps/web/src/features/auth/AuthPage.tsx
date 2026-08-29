@@ -4,8 +4,9 @@ import { useNavigate } from "react-router";
 
 import { BoardOpsButton, GlassSurface, StatusChip } from "../../design";
 import { authApi, WebApiError } from "./api";
+import { PasswordResetPanel } from "./PasswordResetPanel";
 
-type Mode = "login" | "register";
+type Mode = "login" | "register" | "reset";
 
 function errorMessage(error: unknown): string {
   return error instanceof WebApiError
@@ -21,8 +22,8 @@ export function AuthPage() {
   const [verificationToken, setVerificationToken] = useState<string>();
 
   const [institutionSlug, setInstitutionSlug] = useState("demo");
-  const [identifier, setIdentifier] = useState("admin@boardops.local");
-  const [loginPassword, setLoginPassword] = useState("BoardOpsLocal#2026");
+  const [identifier, setIdentifier] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
 
   const [institutionUserId, setInstitutionUserId] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -88,76 +89,48 @@ export function AuthPage() {
     }
   }
 
-  async function createLocalDemo() {
-    setBusy(true);
-    setMessage(undefined);
-    try {
-      const demo = await authApi.bootstrapDemo();
-      setInstitutionSlug(demo.institutionSlug);
-      setIdentifier(demo.identifier);
-      setLoginPassword(demo.password);
-      await authApi.login({
-        institutionSlug: demo.institutionSlug,
-        identifier: demo.identifier,
-        password: demo.password,
-      });
-      navigate("/account");
-    } catch (error) {
-      setMessage(errorMessage(error));
-    } finally {
-      setBusy(false);
-    }
-  }
-
   return (
     <main className="auth-page">
       <div className="ambient ambient--one" aria-hidden="true" />
       <div className="ambient ambient--two" aria-hidden="true" />
       <section className="auth-layout" aria-labelledby="auth-title">
         <div className="auth-intro">
-          <StatusChip>PHASE 04</StatusChip>
-          <h1 id="auth-title">
-            Secure access, without the admin-template feel.
-          </h1>
+          <StatusChip>SECURE ACCESS</StatusChip>
+          <h1 id="auth-title">Institution identity, protected by default.</h1>
           <p>
-            BoardOps now has institution-scoped identity, verification, review
-            states, secure sessions, permission-aware access, and device
-            revocation foundations.
+            Registration, email verification, administrator review, recovery,
+            revocable sessions, and step-up security share one institution-scoped
+            authentication model.
           </p>
-          <div
-            className="auth-principles"
-            aria-label="Authentication principles"
-          >
+          <div className="auth-principles" aria-label="Authentication principles">
             <span>Institution User ID</span>
             <span>HttpOnly web session</span>
-            <span>Permission-based authorization</span>
+            <span>Account approval</span>
             <span>Audited lifecycle</span>
           </div>
         </div>
 
         <GlassSurface className="auth-card" strength="strong">
-          <div
-            className="auth-tabs"
-            role="tablist"
-            aria-label="Authentication mode"
-          >
-            <BoardOpsButton
-              aria-selected={mode === "login"}
-              role="tab"
-              tone={mode === "login" ? "primary" : "neutral"}
-              onClick={() => setMode("login")}
-            >
-              Sign in
-            </BoardOpsButton>
-            <BoardOpsButton
-              aria-selected={mode === "register"}
-              role="tab"
-              tone={mode === "register" ? "primary" : "neutral"}
-              onClick={() => setMode("register")}
-            >
-              Register
-            </BoardOpsButton>
-          </div>
+          {mode !== "reset" ? (
+            <div className="auth-tabs" role="tablist" aria-label="Authentication mode">
+              <BoardOpsButton
+                aria-selected={mode === "login"}
+                role="tab"
+                tone={mode === "login" ? "primary" : "neutral"}
+                onClick={() => setMode("login")}
+              >
+                Sign in
+              </BoardOpsButton>
+              <BoardOpsButton
+                aria-selected={mode === "register"}
+                role="tab"
+                tone={mode === "register" ? "primary" : "neutral"}
+                onClick={() => setMode("register")}
+              >
+                Register
+              </BoardOpsButton>
+            </div>
+          ) : null}
 
           {mode === "login" ? (
             <form className="auth-form" onSubmit={signIn}>
@@ -201,12 +174,12 @@ export function AuthPage() {
                 className="auth-demo-link"
                 disabled={busy}
                 type="button"
-                onClick={createLocalDemo}
+                onClick={() => setMode("reset")}
               >
-                Create / refresh local demo administrator
+                Forgot password?
               </button>
             </form>
-          ) : (
+          ) : mode === "register" ? (
             <form className="auth-form" onSubmit={register}>
               <div className="auth-form__heading">
                 <span className="section-label">Institution registration</span>
@@ -214,38 +187,19 @@ export function AuthPage() {
               </div>
               <label>
                 Institution
-                <input
-                  value={institutionSlug}
-                  onChange={(event) => setInstitutionSlug(event.target.value)}
-                  required
-                />
+                <input value={institutionSlug} onChange={(event) => setInstitutionSlug(event.target.value)} required />
               </label>
               <label>
                 Institution User ID
-                <input
-                  value={institutionUserId}
-                  onChange={(event) => setInstitutionUserId(event.target.value)}
-                  required
-                />
+                <input value={institutionUserId} onChange={(event) => setInstitutionUserId(event.target.value)} required />
               </label>
               <label>
                 Full name
-                <input
-                  autoComplete="name"
-                  value={displayName}
-                  onChange={(event) => setDisplayName(event.target.value)}
-                  required
-                />
+                <input autoComplete="name" value={displayName} onChange={(event) => setDisplayName(event.target.value)} required />
               </label>
               <label>
                 Email
-                <input
-                  autoComplete="email"
-                  type="email"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  required
-                />
+                <input autoComplete="email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
               </label>
               <label>
                 Password
@@ -255,9 +209,7 @@ export function AuthPage() {
                   maxLength={128}
                   type="password"
                   value={registrationPassword}
-                  onChange={(event) =>
-                    setRegistrationPassword(event.target.value)
-                  }
+                  onChange={(event) => setRegistrationPassword(event.target.value)}
                   required
                 />
               </label>
@@ -270,9 +222,15 @@ export function AuthPage() {
                 </BoardOpsButton>
               ) : null}
             </form>
+          ) : (
+            <PasswordResetPanel
+              institutionSlug={institutionSlug}
+              identifier={identifier}
+              onBack={() => setMode("login")}
+            />
           )}
 
-          {message ? (
+          {message && mode !== "reset" ? (
             <p className="auth-message" role="status">
               {message}
             </p>
