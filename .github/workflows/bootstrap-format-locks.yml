@@ -7,6 +7,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: phase-01-bootstrap
+  cancel-in-progress: true
+
 jobs:
   bootstrap:
     if: github.actor != 'github-actions[bot]'
@@ -41,6 +45,9 @@ jobs:
       - name: Resolve Flutter lockfile
         working-directory: apps/mobile
         run: flutter pub get
+
+      - name: Normalize Flutter config formatting
+        run: pnpm exec prettier --write apps/mobile/analysis_options.yaml apps/mobile/pubspec.yaml
 
       - name: Commit deterministic formatting and lockfiles
         run: |
