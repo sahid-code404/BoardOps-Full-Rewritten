@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+### Phase 04 — Authentication foundation
+
+- Added D1 authentication migrations for users, account-state history, password credentials, sessions, verification/reset credentials, OTP challenges, login-attempt throttling, and role/permission foundations.
+- Added institution-scoped registration with stable Institution User ID, email verification, pending review, approval, rejection, and request-changes lifecycle states.
+- Added PBKDF2-SHA256 password hashing through Web Crypto with random salts, 600,000 iterations, and constant-time credential comparison.
+- Added D1-backed login throttling and audit evidence for successful, failed, and rate-limited authentication attempts without logging submitted passwords or raw IP values.
+- Added server-side revocable sessions with HttpOnly Web cookies and mobile bearer-token support.
+- Added session/device listing, logout, targeted revocation, password-reset all-session invalidation, and audit events for security-sensitive session actions.
+- Added bounded five-minute `STEP_UP` OTP challenges with request/attempt limits and replay prevention.
+- Added permission-protected registration review using `resident.approve` rather than hardcoded role names.
+- Added React/Vite authentication, password-reset, account-security, OTP, and session-management UI.
+- Added Flutter authentication/account-security flows using Riverpod, Dio, and OS-backed secure token storage.
+- Pinned `flutter_secure_storage` to 10.3.1 after native CI compatibility verification with Flutter 3.47.1; the previously proposed 11.x version is not used.
+- Expanded the OpenAPI v1 authentication contract and API architecture documentation.
+- Added a real local authentication smoke flow covering bootstrap, login, OTP/replay rejection, registration, verification, approval, password reset, relogin, session listing, and revocation.
+- Verified the Phase 04 implementation gates in GitHub Actions run `33268045449` before documentation closure.
+- Kept real email delivery, authenticator-app 2FA, full permission administration, profile/R2 behavior, and production Cloudflare provisioning explicitly deferred to their later phases.
+
 ### Phase 03 — Backend foundation
 
 - Added the Cloudflare Worker fetch/queue/workflow runtime foundation around Hono.

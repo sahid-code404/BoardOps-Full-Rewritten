@@ -4,86 +4,105 @@ BoardOps is being rebuilt from scratch as a production-grade institutional mess 
 
 ## Current phase
 
-**Phase 03 — Backend foundation is runnable and ready for local testing.**
+**Phase 04 — Authentication foundation is runnable and ready for local testing.**
 
-Active implementation branch: `phase/03-backend-foundation`.
+Active implementation branch: `phase/04-authentication-foundation`.
 
-Phase 01 and Phase 02 are merged into `main`. The existing application at `sahid-code404/BoardOpsv2rewrite` remains a read-only visual and functional reference; legacy framework code is not copied into the rewrite.
+Phases 01–03 are merged into `main`. The existing application at `sahid-code404/BoardOpsv2rewrite` remains a read-only visual and functional reference; legacy framework code is not copied into the rewrite.
 
-Phase 03 establishes the backend substrate before authentication/business domains:
+Phase 04 adds the first end-to-end identity and session boundary:
 
-- Cloudflare Worker + Hono HTTP application;
-- D1 migration foundation;
-- development/staging/production D1, R2, Queue/DLQ, and Workflow bindings;
-- liveness/readiness endpoints;
-- stable safe API error envelopes;
-- request IDs and structured logs;
-- idempotency reservation/replay foundation;
-- outbox, append-only audit, and background-task infrastructure tables;
-- versioned queue boundary;
-- durable Workflow capability probe;
-- local D1 migration verification in CI.
+- institution-scoped registration with stable Institution User ID;
+- email-verification and approval lifecycle;
+- permission-protected registration review;
+- login throttling and security audit events;
+- server-side revocable sessions;
+- HttpOnly Web session cookies;
+- Flutter bearer sessions stored through OS-backed secure storage;
+- password reset with all-session invalidation;
+- bounded/replay-resistant OTP step-up verification;
+- Web and Flutter authentication/account-security experiences;
+- OpenAPI authentication contract;
+- local D1 authentication smoke testing in CI.
 
-No business module is implemented in this phase.
+Phase 04 does not claim that production email delivery, authenticator-app 2FA, permission administration, or production Cloudflare provisioning are complete. Those remain explicit later-phase work.
 
-## Verified Phase 03 implementation CI
+## Verified Phase 04 implementation CI
 
-GitHub Actions run `33264402664` passed all required jobs:
+GitHub Actions run `33268045449` verifies the implementation checkpoint with:
 
-- Web/API formatting, lint, TypeScript, tests and builds;
-- Wrangler binding generation;
-- local D1 migration and schema verification;
+- locked dependency installation;
+- formatting and lint;
+- TypeScript plus Wrangler binding generation;
+- Web/API unit tests;
+- local D1 migration verification;
+- authentication end-to-end smoke testing;
+- Web/API builds;
 - Flutter analyze and widget/unit tests;
 - Android debug APK build;
 - iOS no-codesign compile validation.
 
-## Local Phase 03 testing
+## Local Phase 04 testing
 
 From the repository root:
 
 ```bash
 git fetch origin
-git switch phase/03-backend-foundation
-git pull --ff-only origin phase/03-backend-foundation
+git switch phase/04-authentication-foundation
+git pull --ff-only origin phase/04-authentication-foundation
 
 corepack enable
 corepack prepare pnpm@11.23.0 --activate
 pnpm install --frozen-lockfile
-
 pnpm db:verify:local
 ```
 
-Then start the API:
+Start the API:
 
 ```bash
 pnpm --filter @boardops/api dev
 ```
 
-In another terminal, verify:
+In a second terminal, run the complete local authentication smoke test:
 
 ```bash
-curl -i http://127.0.0.1:8787/api/v1/health
-curl -i http://127.0.0.1:8787/api/v1/ready
-curl -i http://127.0.0.1:8787/api/v1/meta
+pnpm auth:smoke:local
 ```
 
-Expected results:
-
-- `/api/v1/health` returns HTTP 200 with `status: "ok"`;
-- `/api/v1/ready` returns HTTP 200 with `status: "ready"` and D1/R2/Queue/Workflow resource flags `true`;
-- responses include `x-request-id`;
-- unknown routes return the stable `NOT_FOUND` error envelope.
-
-The Phase 02 Web preview is unchanged. To regression-check it in another terminal:
+Then start the Web client:
 
 ```bash
 pnpm --filter @boardops/web dev
 ```
 
-Then open `http://localhost:5173`.
+Open `http://localhost:5173/auth`. The Vite development server proxies `/api` to the local Worker at `http://127.0.0.1:8787`.
+
+For manual local sign-in, bootstrap the development-only demo administrator:
+
+```bash
+curl -s -X POST http://127.0.0.1:8787/api/v1/dev/bootstrap \
+  -H 'content-type: application/json' \
+  -d '{}'
+```
+
+The local-only endpoint returns the demo institution/credentials used for manual testing. It is unavailable outside local development.
+
+To exercise Flutter after installing Flutter 3.47.1 and the appropriate Android/iOS SDK:
+
+```bash
+bash scripts/bootstrap-mobile.sh
+cd apps/mobile
+flutter run
+```
+
+iOS device/simulator work requires macOS/Xcode. Android requires an Android SDK plus a connected device or emulator.
+
+## Security notes
+
+Web browser sessions use an HttpOnly cookie; Flutter durable tokens use `flutter_secure_storage`. Development verification/reset/OTP values are exposed only when both the environment is development and the request host is local. Do not turn those development conveniences into production behavior.
 
 ## Remote deployment warning
 
-Staging/production Cloudflare resources are not provisioned by this phase. The D1 IDs in `services/api/wrangler.jsonc` are deliberate placeholder UUIDs. Do not run remote migrations/deployments until the real environment-specific resources exist and those non-secret IDs are configured.
+Staging/production Cloudflare resources and authentication email delivery are not provisioned by Phase 04. The D1 IDs in `services/api/wrangler.jsonc` remain deliberate placeholder UUIDs. Do not run remote migrations/deployments until real environment-specific resources exist and the non-secret resource IDs are configured.
 
-See `docs/architecture/BACKEND-FOUNDATION.md` for the full Phase 03 architecture and operational rules.
+See `docs/architecture/AUTHENTICATION.md` and `docs/decisions/ADR-015-AUTHENTICATION-SESSION-SECURITY.md` for the Phase 04 architecture and security decisions.
