@@ -39,7 +39,23 @@ sessionRoutes.post("/login", async (c) => {
   const throttleKey = await sha256Text(
     `${institutionSlug}:${identifier.trim().toLowerCase()}:${ip}`,
   );
-  await assertLoginAllowed(c.env.DB, throttleKey);
+
+  try {
+    await assertLoginAllowed(c.env.DB, throttleKey);
+  } catch (error) {
+    if (error instanceof ApiError && error.code === "AUTH_RATE_LIMITED") {
+      await auditStatement(c.env.DB, {
+        actorRef: `auth-attempt:${throttleKey}`,
+        action: "auth.login.rate_limited",
+        entityType: "authentication_attempt",
+        entityId: throttleKey,
+        metadata: { clientType: requestedClientType },
+        correlationId: c.get("requestId"),
+        createdAtMs: Date.now(),
+      }).run();
+    }
+    throw error;
+  }
 
   const user = await c.env.DB.prepare(
     `SELECT
@@ -76,6 +92,19 @@ sessionRoutes.post("/login", async (c) => {
 
   if (!user || !passwordValid) {
     await recordLoginFailure(c.env.DB, throttleKey);
+    await auditStatement(c.env.DB, {
+      institutionId: user?.institution_id,
+      actorRef: user?.id ?? `auth-attempt:${throttleKey}`,
+      action: "auth.login.failed",
+      entityType: "authentication_attempt",
+      entityId: throttleKey,
+      metadata: {
+        clientType: requestedClientType,
+        reason: "INVALID_CREDENTIALS",
+      },
+      correlationId: c.get("requestId"),
+      createdAtMs: Date.now(),
+    }).run();
     throw new ApiError(
       401,
       "INVALID_CREDENTIALS",
@@ -160,14 +189,24 @@ sessionRoutes.get("/me", requireAuth, (c) => {
 sessionRoutes.post("/logout", requireAuth, async (c) => {
   const principal = currentPrincipal(c);
   const now = Date.now();
-  await c.env.DB.prepare(
-    `UPDATE sessions SET revoked_at_ms = ?, revoked_reason = 'USER_LOGOUT'
+  const correlationId = c.get("requestId");
+  await c.env.DB.batch([
+    c.env.DB.prepare(
+      `UPDATE sessions SET revoked_at_ms = ?, revoked_reason = 'USER_LOGOUT'
        WHERE id = ? AND revoked_at_ms IS NULL`,
-  )
-    .bind(now, principal.sessionId)
-    .run();
+    ).bind(now, principal.sessionId),
+    auditStatement(c.env.DB, {
+      institutionId: principal.institutionId,
+      actorRef: principal.userId,
+      action: "auth.logout",
+      entityType: "session",
+      entityId: principal.sessionId,
+      correlationId,
+      createdAtMs: now,
+    }),
+  ]);
   clearSessionCookie(c);
-  return c.json({ status: "signed_out", requestId: c.get("requestId") });
+  return c.json({ status: "signed_out", requestId: correlationId });
 });
 
 sessionRoutes.get("/sessions", requireAuth, async (c) => {
@@ -189,6 +228,7 @@ sessionRoutes.delete("/sessions/:sessionId", requireAuth, async (c) => {
   const principal = currentPrincipal(c);
   const sessionId = c.req.param("sessionId");
   const now = Date.now();
+  const correlationId = c.get("requestId");
   const result = await c.env.DB.prepare(
     `UPDATE sessions
        SET revoked_at_ms = ?, revoked_reason = 'USER_REVOKED'
@@ -199,6 +239,18 @@ sessionRoutes.delete("/sessions/:sessionId", requireAuth, async (c) => {
   if (result.meta.changes === 0) {
     throw new ApiError(404, "SESSION_NOT_FOUND", "Session not found.");
   }
+
+  await auditStatement(c.env.DB, {
+    institutionId: principal.institutionId,
+    actorRef: principal.userId,
+    action: "auth.session.revoked",
+    entityType: "session",
+    entityId: sessionId,
+    metadata: { currentSession: sessionId === principal.sessionId },
+    correlationId,
+    createdAtMs: now,
+  }).run();
+
   if (sessionId === principal.sessionId) clearSessionCookie(c);
-  return c.json({ status: "revoked", requestId: c.get("requestId") });
+  return c.json({ status: "revoked", requestId: correlationId });
 });
