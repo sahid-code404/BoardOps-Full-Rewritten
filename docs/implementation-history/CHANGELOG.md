@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### Phase 03 — Backend foundation
+
+- Added the Cloudflare Worker fetch/queue/workflow runtime foundation around Hono.
+- Added D1 migration `0001_backend_foundation.sql` for institutions, idempotency, outbox, append-only audit, and background-task infrastructure.
+- Added explicit development/staging/production D1, R2, Queue/DLQ, and Workflow bindings.
+- Added `/api/v1/ready`, safe centralized API error envelopes, request IDs, and structured request logging.
+- Added Web-Crypto SHA-256 idempotency reservation/replay helpers with conflicting-key rejection.
+- Added a strict versioned infrastructure queue message boundary and durable Workflow capability probe.
+- Added local D1 migration/schema verification to the main CI gate without introducing an ORM or new runtime dependency.
+- Verified Web/API, local D1, Flutter Android, and Flutter iOS gates green in GitHub Actions run `33264402664`.
+- Documented that remote D1 IDs remain deliberate placeholders until real staging/production resources are provisioned.
+
 ### Phase 02 — Shared design language
 
 - Added a canonical platform-neutral design-token source shared by React/Vite and Flutter.
@@ -12,8 +24,8 @@
 - Added Flutter BoardOps theme, `GlassPanel` and `BoardOpsStatusChip` primitives.
 - Added responsive Phase 02 preview surfaces, semantic light/dark colors, reduced-motion behavior and 44 px minimum touch targets.
 - Added Phase 02 architecture and implementation-history documentation.
-- Verified Web/API, Flutter Android and Flutter iOS gates green in GitHub Actions run `33263066836`.
-- Marked the Phase 02 visual checkpoint runnable for manual Web review before business modules begin.
+- Verified Web/API, Flutter Android and Flutter iOS gates green in GitHub Actions run `33263308288`.
+- Merged Phase 02 into `main` before beginning Phase 03.
 
 ### Phase 01 — Architecture
 
