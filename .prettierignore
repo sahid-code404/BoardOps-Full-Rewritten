@@ -1,3 +1,5 @@
-.github/workflows/
-apps/mobile/android/
-apps/mobile/ios/
+pnpm-lock.yaml
+apps/mobile/pubspec.lock
+apps/mobile/lib/design/design_tokens.dart
+packages/design-tokens/web/tokens.css
+scripts/generate-design-tokens.mjs

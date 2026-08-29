@@ -1,0 +1,121 @@
+/* GENERATED FILE — edit packages/design-tokens/tokens.json and run pnpm design:tokens. */
+:root {
+  --bo-radius-sm: 12px;
+  --bo-radius-md: 16px;
+  --bo-radius-lg: 20px;
+  --bo-radius-xl: 24px;
+  --bo-radius-xxl: 32px;
+  --bo-radius-pill: 999px;
+  --bo-space-xs: 4px;
+  --bo-space-sm: 8px;
+  --bo-space-md: 12px;
+  --bo-space-lg: 16px;
+  --bo-space-xl: 24px;
+  --bo-space-xxl: 32px;
+  --bo-space-xxxl: 48px;
+  --bo-type-display: 56px;
+  --bo-type-headline: 34px;
+  --bo-type-title: 24px;
+  --bo-type-body: 16px;
+  --bo-type-label: 13px;
+  --bo-type-caption: 12px;
+  --bo-motion-instant: 80ms;
+  --bo-motion-fast: 160ms;
+  --bo-motion-regular: 240ms;
+  --bo-motion-slow: 360ms;
+  --bo-motion-emphasized: 520ms;
+  --bo-motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --bo-motion-ease-emphasized: cubic-bezier(0.22, 1, 0.36, 1);
+  --bo-glass-blur-soft: 8px;
+  --bo-glass-blur-regular: 14px;
+  --bo-glass-blur-strong: 22px;
+  --bo-glass-saturation: 1.15;
+  --bo-shadow-sm: 0 2px 8px rgb(18 13 25 / 0.10);
+  --bo-shadow-md: 0 12px 36px rgb(18 13 25 / 0.16);
+  --bo-shadow-lg: 0 24px 80px rgb(18 13 25 / 0.24);
+  --bo-breakpoint-compact: 600px;
+  --bo-breakpoint-medium: 768px;
+  --bo-breakpoint-expanded: 1024px;
+  --bo-breakpoint-wide: 1440px;
+  --bo-touch-target: 44px;
+}
+
+:root, [data-theme="light"] {
+  --bo-color-background: #FBFAFF;
+  --bo-color-background-elevated: #F3F0FA;
+  --bo-color-foreground: #242128;
+  --bo-color-foreground-muted: #6F6977;
+  --bo-color-surface: #FFFFFF;
+  --bo-color-surface-muted: #F4F1F8;
+  --bo-color-glass: #FFFFFFE8;
+  --bo-color-glass-strong: #FFFFFFF2;
+  --bo-color-border: #2A20331F;
+  --bo-color-border-strong: #2A32382D;
+  --bo-color-primary: #7856D8;
+  --bo-color-primary-foreground: #FFFFFF;
+  --bo-color-primary-soft: #E9E0FF;
+  --bo-color-accent: #A94BCB;
+  --bo-color-success: #2F9E67;
+  --bo-color-warning: #C78620;
+  --bo-color-danger: #D9534F;
+  --bo-color-info: #367FD3;
+  --bo-color-chart1: #7856D8;
+  --bo-color-chart2: #2F9E67;
+  --bo-color-chart3: #C78620;
+  --bo-color-chart4: #B44E8D;
+  --bo-color-chart5: #367FD3;
+}
+
+[data-theme="dark"] {
+  --bo-color-background: #15131A;
+  --bo-color-background-elevated: #1C1922;
+  --bo-color-foreground: #F7F4FB;
+  --bo-color-foreground-muted: #B1AAB9;
+  --bo-color-surface: #24212A;
+  --bo-color-surface-muted: #2D2934;
+  --bo-color-glass: #211E28E3;
+  --bo-color-glass-strong: #27232EF0;
+  --bo-color-border: #FFFFFF24;
+  --bo-color-border-strong: #FFFFFF34;
+  --bo-color-primary: #A987FF;
+  --bo-color-primary-foreground: #18131F;
+  --bo-color-primary-soft: #3A2B55;
+  --bo-color-accent: #DB79F1;
+  --bo-color-success: #61C68A;
+  --bo-color-warning: #E6B45A;
+  --bo-color-danger: #F27D78;
+  --bo-color-info: #72AEF2;
+  --bo-color-chart1: #A987FF;
+  --bo-color-chart2: #61C68A;
+  --bo-color-chart3: #E6B45A;
+  --bo-color-chart4: #E678B1;
+  --bo-color-chart5: #72AEF2;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bo-color-background: #15131A;
+    --bo-color-background-elevated: #1C1922;
+    --bo-color-foreground: #F7F4FB;
+    --bo-color-foreground-muted: #B1AAB9;
+    --bo-color-surface: #24212A;
+    --bo-color-surface-muted: #2D2934;
+    --bo-color-glass: #211E28E3;
+    --bo-color-glass-strong: #27232EF0;
+    --bo-color-border: #FFFFFF24;
+    --bo-color-border-strong: #FFFFFF34;
+    --bo-color-primary: #A987FF;
+    --bo-color-primary-foreground: #18131F;
+    --bo-color-primary-soft: #3A2B55;
+    --bo-color-accent: #DB79F1;
+    --bo-color-success: #61C68A;
+    --bo-color-warning: #E6B45A;
+    --bo-color-danger: #F27D78;
+    --bo-color-info: #72AEF2;
+    --bo-color-chart1: #A987FF;
+    --bo-color-chart2: #61C68A;
+    --bo-color-chart3: #E6B45A;
+    --bo-color-chart4: #E678B1;
+    --bo-color-chart5: #72AEF2;
+  }
+}
