@@ -6,6 +6,7 @@ Nothing from the reference disappears silently. Every meaningful legacy feature 
 | ---------------------------------------------------- | ----------------- | ------------------------------------------------------------------ |
 | Registration/login/email verification/password reset | REFINED           | Same user goals, stronger Workers auth/security                    |
 | 2FA and sessions                                     | REFINED           | Preserve capability, explicit devices/revocation/secure storage    |
+| Roles and permission administration                  | CORRECTED/REFINED | Backend permissions, DENY precedence, audited changes              |
 | Resident/admin dashboard                             | REFINED           | Preserve useful KPIs, fixed resident v1 content                    |
 | Dynamic meals                                        | PRESERVED/REFINED | No hardcoded meal names; add locked special/holiday rules          |
 | Resident meal booking/history                        | REFINED           | Continuous schedule + cutoff authority                             |

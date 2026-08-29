@@ -95,6 +95,7 @@ export function AccountPage() {
   }
 
   const active = me.user.accountState === "ACTIVE";
+  const canReadPermissions = me.user.permissions.includes("permissions.read");
 
   return (
     <main className="auth-page account-page">
@@ -112,6 +113,11 @@ export function AccountPage() {
             <StatusChip tone={active ? "success" : "warning"}>
               {me.user.accountState}
             </StatusChip>
+            {canReadPermissions ? (
+              <BoardOpsButton onClick={() => navigate("/permissions")}>
+                Access control
+              </BoardOpsButton>
+            ) : null}
             <BoardOpsButton onClick={logout}>Sign out</BoardOpsButton>
           </div>
         </header>

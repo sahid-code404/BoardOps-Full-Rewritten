@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: BoardOps API
-  version: 0.4.0
+  version: 0.5.0
   description: Institution-scoped BoardOps API contract.
 servers:
   - url: /api/v1
@@ -16,6 +16,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthResponse"
+
   /auth/register:
     post:
       operationId: registerAccount
@@ -34,6 +35,7 @@ paths:
                 $ref: "#/components/schemas/RegistrationResponse"
         "4XX":
           $ref: "#/components/responses/ApiError"
+
   /auth/verify-email:
     post:
       operationId: verifyEmail
@@ -51,6 +53,7 @@ paths:
           $ref: "#/components/responses/StatusResponse"
         "4XX":
           $ref: "#/components/responses/ApiError"
+
   /auth/login:
     post:
       operationId: login
@@ -69,6 +72,7 @@ paths:
                 $ref: "#/components/schemas/LoginResponse"
         "4XX":
           $ref: "#/components/responses/ApiError"
+
   /auth/me:
     get:
       operationId: getCurrentAccount
@@ -84,6 +88,7 @@ paths:
                 $ref: "#/components/schemas/MeResponse"
         "401":
           $ref: "#/components/responses/ApiError"
+
   /auth/logout:
     post:
       operationId: logout
@@ -95,6 +100,7 @@ paths:
           $ref: "#/components/responses/StatusResponse"
         "401":
           $ref: "#/components/responses/ApiError"
+
   /auth/sessions:
     get:
       operationId: listSessions
@@ -117,6 +123,7 @@ paths:
                   requestId: { type: string }
         "401":
           $ref: "#/components/responses/ApiError"
+
   /auth/sessions/{sessionId}:
     delete:
       operationId: revokeSession
@@ -124,15 +131,13 @@ paths:
         - cookieAuth: []
         - bearerAuth: []
       parameters:
-        - name: sessionId
-          in: path
-          required: true
-          schema: { type: string }
+        - $ref: "#/components/parameters/SessionId"
       responses:
         "200":
           $ref: "#/components/responses/StatusResponse"
         "4XX":
           $ref: "#/components/responses/ApiError"
+
   /auth/otp/request:
     post:
       operationId: requestStepUpOtp
@@ -156,6 +161,7 @@ paths:
                 $ref: "#/components/schemas/OtpChallengeResponse"
         "4XX":
           $ref: "#/components/responses/ApiError"
+
   /auth/otp/verify:
     post:
       operationId: verifyStepUpOtp
@@ -171,9 +177,7 @@ paths:
               required: [challengeId, code]
               properties:
                 challengeId: { type: string, minLength: 16, maxLength: 80 }
-                code:
-                  type: string
-                  pattern: "^[0-9]{6}$"
+                code: { type: string, pattern: "^[0-9]{6}$" }
       responses:
         "200":
           description: OTP consumed and current session marked step-up verified.
@@ -189,6 +193,7 @@ paths:
                   requestId: { type: string }
         "4XX":
           $ref: "#/components/responses/ApiError"
+
   /auth/password-reset/request:
     post:
       operationId: requestPasswordReset
@@ -216,6 +221,7 @@ paths:
                   requestId: { type: string }
         "4XX":
           $ref: "#/components/responses/ApiError"
+
   /auth/password-reset/confirm:
     post:
       operationId: confirmPasswordReset
@@ -234,6 +240,7 @@ paths:
           $ref: "#/components/responses/StatusResponse"
         "4XX":
           $ref: "#/components/responses/ApiError"
+
   /auth/registrations:
     get:
       operationId: listPendingRegistrations
@@ -256,6 +263,7 @@ paths:
                   requestId: { type: string }
         "4XX":
           $ref: "#/components/responses/ApiError"
+
   /auth/registrations/{userId}/review:
     post:
       operationId: reviewRegistration
@@ -263,10 +271,7 @@ paths:
         - cookieAuth: []
         - bearerAuth: []
       parameters:
-        - name: userId
-          in: path
-          required: true
-          schema: { type: string }
+        - $ref: "#/components/parameters/UserId"
       requestBody:
         required: true
         content:
@@ -284,6 +289,256 @@ paths:
           $ref: "#/components/responses/StatusResponse"
         "4XX":
           $ref: "#/components/responses/ApiError"
+
+  /permissions/me:
+    get:
+      operationId: getMyEffectivePermissions
+      description: Returns the authenticated user's roles, direct overrides, and effective permissions.
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Effective authorization summary.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PermissionSelfResponse"
+        "401":
+          $ref: "#/components/responses/ApiError"
+
+  /permissions/catalog:
+    get:
+      operationId: listPermissionCatalog
+      description: Requires permissions.read.
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Canonical permission catalog.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [permissions, requestId]
+                properties:
+                  permissions:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PermissionDefinition"
+                  requestId: { type: string }
+        "403":
+          $ref: "#/components/responses/ApiError"
+
+  /permissions/roles:
+    get:
+      operationId: listRoles
+      description: Requires permissions.read.
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Institution roles and their permission assignments.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [roles, requestId]
+                properties:
+                  roles:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PermissionRole"
+                  requestId: { type: string }
+        "403":
+          $ref: "#/components/responses/ApiError"
+    post:
+      operationId: createRole
+      description: Requires permissions.manage and recent STEP_UP verification.
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoleWriteRequest"
+      responses:
+        "201":
+          description: Custom role created.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [role, requestId]
+                properties:
+                  role:
+                    $ref: "#/components/schemas/PermissionRole"
+                  requestId: { type: string }
+        "4XX":
+          $ref: "#/components/responses/ApiError"
+
+  /permissions/roles/{roleId}:
+    put:
+      operationId: updateRole
+      description: Requires permissions.manage and recent STEP_UP verification. System roles are immutable.
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/RoleId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoleWriteRequest"
+      responses:
+        "200":
+          description: Custom role updated.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [role, requestId]
+                properties:
+                  role:
+                    $ref: "#/components/schemas/PermissionRole"
+                  requestId: { type: string }
+        "4XX":
+          $ref: "#/components/responses/ApiError"
+
+  /permissions/users:
+    get:
+      operationId: listAccessUsers
+      description: Requires permissions.read. Returns only users in the current institution.
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Institution access identities.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [users, requestId]
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/AccessUser"
+                  requestId: { type: string }
+        "403":
+          $ref: "#/components/responses/ApiError"
+
+  /permissions/users/{userId}:
+    get:
+      operationId: getUserAccess
+      description: Requires permissions.read and enforces current-institution scope.
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+      responses:
+        "200":
+          description: User role membership, direct overrides, and effective permissions.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserAccessResponse"
+        "4XX":
+          $ref: "#/components/responses/ApiError"
+
+  /permissions/users/{userId}/roles:
+    put:
+      operationId: replaceUserRoles
+      description: Requires permissions.manage, recent STEP_UP, institution-scoped roles, a reason, and self-lockout validation.
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [roleIds, reason]
+              properties:
+                roleIds:
+                  type: array
+                  maxItems: 40
+                  uniqueItems: true
+                  items: { type: string }
+                reason: { type: string, minLength: 3, maxLength: 500 }
+      responses:
+        "200":
+          description: Role membership replaced.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [roleIds, effectivePermissions, requestId]
+                properties:
+                  roleIds:
+                    type: array
+                    items: { type: string }
+                  effectivePermissions:
+                    type: array
+                    items: { type: string }
+                  requestId: { type: string }
+        "4XX":
+          $ref: "#/components/responses/ApiError"
+
+  /permissions/users/{userId}/grants/{permissionCode}:
+    put:
+      operationId: setUserPermissionOverride
+      description: Requires permissions.manage, recent STEP_UP, a canonical permission code, a reason, and self-lockout validation. DENY overrides every allow source; INHERIT removes the direct override.
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+        - name: permissionCode
+          in: path
+          required: true
+          schema: { type: string, maxLength: 100 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [effect, reason]
+              properties:
+                effect:
+                  type: string
+                  enum: [ALLOW, DENY, INHERIT]
+                reason: { type: string, minLength: 3, maxLength: 500 }
+      responses:
+        "200":
+          description: Direct permission override changed or removed.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [permissionCode, effect, effectivePermissions, requestId]
+                properties:
+                  permissionCode: { type: string }
+                  effect: { type: string, enum: [ALLOW, DENY, INHERIT] }
+                  effectivePermissions:
+                    type: array
+                    items: { type: string }
+                  requestId: { type: string }
+        "4XX":
+          $ref: "#/components/responses/ApiError"
+
 components:
   securitySchemes:
     cookieAuth:
@@ -294,6 +549,24 @@ components:
       type: http
       scheme: bearer
       bearerFormat: opaque-session-token
+
+  parameters:
+    SessionId:
+      name: sessionId
+      in: path
+      required: true
+      schema: { type: string }
+    UserId:
+      name: userId
+      in: path
+      required: true
+      schema: { type: string }
+    RoleId:
+      name: roleId
+      in: path
+      required: true
+      schema: { type: string }
+
   responses:
     ApiError:
       description: Structured API error.
@@ -311,6 +584,7 @@ components:
             properties:
               status: { type: string }
               requestId: { type: string }
+
   schemas:
     HealthResponse:
       type: object
@@ -320,16 +594,17 @@ components:
         service: { type: string, const: boardops-api }
         apiVersion: { type: string, const: v1 }
         requestId: { type: string }
+
     RegistrationRequest:
       type: object
-      required:
-        [institutionSlug, institutionUserId, displayName, email, password]
+      required: [institutionSlug, institutionUserId, displayName, email, password]
       properties:
         institutionSlug: { type: string, minLength: 2, maxLength: 80 }
         institutionUserId: { type: string, minLength: 2, maxLength: 80 }
         displayName: { type: string, minLength: 2, maxLength: 120 }
         email: { type: string, format: email, maxLength: 254 }
         password: { type: string, minLength: 12, maxLength: 128 }
+
     RegistrationResponse:
       type: object
       required: [status, userId, institution, requestId]
@@ -345,6 +620,7 @@ components:
             institutionUserIdLabel: { type: string }
         developmentVerificationToken: { type: string }
         requestId: { type: string }
+
     LoginRequest:
       type: object
       required: [institutionSlug, identifier, password]
@@ -357,6 +633,7 @@ components:
           enum: [WEB, MOBILE]
           default: WEB
         deviceName: { type: string, maxLength: 120 }
+
     LoginResponse:
       type: object
       required: [status, accountState, session, user, requestId]
@@ -383,6 +660,7 @@ components:
             displayName: { type: string }
             email: { type: string, format: email }
         requestId: { type: string }
+
     MeResponse:
       type: object
       required: [user, session, requestId]
@@ -398,17 +676,10 @@ components:
             stepUpVerifiedAtMs:
               type: [integer, "null"]
         requestId: { type: string }
+
     AuthUser:
       type: object
-      required:
-        - id
-        - institutionId
-        - institutionSlug
-        - institutionUserId
-        - email
-        - displayName
-        - accountState
-        - permissions
+      required: [id, institutionId, institutionSlug, institutionUserId, email, displayName, accountState, permissions]
       properties:
         id: { type: string }
         institutionId: { type: string }
@@ -420,14 +691,10 @@ components:
         permissions:
           type: array
           items: { type: string }
+
     DeviceSession:
       type: object
-      required:
-        - id
-        - client_type
-        - created_at_ms
-        - last_seen_at_ms
-        - expires_at_ms
+      required: [id, client_type, created_at_ms, last_seen_at_ms, expires_at_ms]
       properties:
         id: { type: string }
         client_type: { type: string, enum: [WEB, MOBILE] }
@@ -442,6 +709,7 @@ components:
           type: [integer, "null"]
         step_up_verified_at_ms:
           type: [integer, "null"]
+
     OtpChallengeResponse:
       type: object
       required: [status, challengeId, purpose, expiresAtMs, requestId]
@@ -454,15 +722,10 @@ components:
           type: string
           pattern: "^[0-9]{6}$"
         requestId: { type: string }
+
     PendingRegistration:
       type: object
-      required:
-        - id
-        - institution_user_id
-        - email
-        - display_name
-        - account_state
-        - created_at_ms
+      required: [id, institution_user_id, email, display_name, account_state, created_at_ms]
       properties:
         id: { type: string }
         institution_user_id: { type: string }
@@ -473,6 +736,102 @@ components:
           type: [integer, "null"]
         created_at_ms: { type: integer }
         updated_at_ms: { type: integer }
+
+    PermissionDefinition:
+      type: object
+      required: [code, description]
+      properties:
+        code: { type: string }
+        description: { type: string }
+
+    DirectPermissionGrant:
+      type: object
+      required: [code, effect]
+      properties:
+        code: { type: string }
+        effect: { type: string, enum: [ALLOW, DENY] }
+
+    PermissionRole:
+      type: object
+      required: [id, name, system, permissionCodes]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        system: { type: boolean }
+        permissionCodes:
+          type: array
+          uniqueItems: true
+          items: { type: string }
+        createdAtMs: { type: integer }
+        updatedAtMs: { type: integer }
+
+    RoleWriteRequest:
+      type: object
+      required: [name, permissionCodes]
+      properties:
+        name: { type: string, minLength: 2, maxLength: 80 }
+        permissionCodes:
+          type: array
+          maxItems: 100
+          uniqueItems: true
+          items: { type: string, maxLength: 100 }
+
+    AccessUser:
+      type: object
+      required: [id, institutionUserId, email, displayName, accountState]
+      properties:
+        id: { type: string }
+        institutionUserId: { type: string }
+        email: { type: string, format: email }
+        displayName: { type: string }
+        accountState: { type: string }
+
+    AccessRoleSummary:
+      type: object
+      required: [id, name, system]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        system: { type: boolean }
+
+    PermissionSelfResponse:
+      type: object
+      required: [roles, directGrants, effectivePermissions, requestId]
+      properties:
+        roles:
+          type: array
+          items:
+            $ref: "#/components/schemas/AccessRoleSummary"
+        directGrants:
+          type: array
+          items:
+            $ref: "#/components/schemas/DirectPermissionGrant"
+        effectivePermissions:
+          type: array
+          uniqueItems: true
+          items: { type: string }
+        requestId: { type: string }
+
+    UserAccessResponse:
+      type: object
+      required: [user, roles, directGrants, effectivePermissions, requestId]
+      properties:
+        user:
+          $ref: "#/components/schemas/AccessUser"
+        roles:
+          type: array
+          items:
+            $ref: "#/components/schemas/AccessRoleSummary"
+        directGrants:
+          type: array
+          items:
+            $ref: "#/components/schemas/DirectPermissionGrant"
+        effectivePermissions:
+          type: array
+          uniqueItems: true
+          items: { type: string }
+        requestId: { type: string }
+
     ErrorEnvelope:
       type: object
       required: [error]

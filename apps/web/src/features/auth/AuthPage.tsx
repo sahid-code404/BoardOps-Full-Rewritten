@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router";
 
-import { BoardOpsButton, GlassSurface, StatusChip } from "../../design";
+import { BoardOpsButton, GlassSurface } from "../../design";
 import { authApi, WebApiError } from "./api";
 import { PasswordResetPanel } from "./PasswordResetPanel";
 
@@ -91,29 +91,22 @@ export function AuthPage() {
 
   return (
     <main className="auth-page">
-      <div className="ambient ambient--one" aria-hidden="true" />
-      <div className="ambient ambient--two" aria-hidden="true" />
-      <section className="auth-layout" aria-labelledby="auth-title">
-        <div className="auth-intro">
-          <StatusChip>SECURE ACCESS</StatusChip>
-          <h1 id="auth-title">Institution identity, protected by default.</h1>
-          <p>
-            Registration, email verification, administrator review, recovery,
-            revocable sessions, and step-up security share one
-            institution-scoped authentication model.
-          </p>
-          <div
-            className="auth-principles"
-            aria-label="Authentication principles"
-          >
-            <span>Institution User ID</span>
-            <span>HttpOnly web session</span>
-            <span>Account approval</span>
-            <span>Audited lifecycle</span>
-          </div>
-        </div>
+      <div className="auth-mesh auth-mesh--one" aria-hidden="true" />
+      <div className="auth-mesh auth-mesh--two" aria-hidden="true" />
+      <div className="auth-mesh auth-mesh--three" aria-hidden="true" />
 
+      <section className="auth-layout" aria-label="BoardOps authentication">
         <GlassSurface className="auth-card" strength="strong">
+          <div className="auth-brand">
+            <div className="auth-brand__mark" aria-hidden="true">
+              ✦
+            </div>
+            <div>
+              <strong>BoardOps</strong>
+              <span>Operations Suite</span>
+            </div>
+          </div>
+
           {mode !== "reset" ? (
             <div
               className="auth-tabs"
@@ -141,10 +134,6 @@ export function AuthPage() {
 
           {mode === "login" ? (
             <form className="auth-form" onSubmit={signIn}>
-              <div className="auth-form__heading">
-                <span className="section-label">Welcome back</span>
-                <h2>Sign in to BoardOps</h2>
-              </div>
               <label>
                 Institution
                 <input
@@ -176,6 +165,7 @@ export function AuthPage() {
               </label>
               <BoardOpsButton disabled={busy} tone="primary" type="submit">
                 {busy ? "Signing in…" : "Sign in"}
+                <span aria-hidden="true">→</span>
               </BoardOpsButton>
               <button
                 className="auth-demo-link"
@@ -188,10 +178,6 @@ export function AuthPage() {
             </form>
           ) : mode === "register" ? (
             <form className="auth-form" onSubmit={register}>
-              <div className="auth-form__heading">
-                <span className="section-label">Institution registration</span>
-                <h2>Create your account</h2>
-              </div>
               <label>
                 Institution
                 <input
@@ -243,6 +229,7 @@ export function AuthPage() {
               </label>
               <BoardOpsButton disabled={busy} tone="primary" type="submit">
                 {busy ? "Creating…" : "Create account"}
+                <span aria-hidden="true">→</span>
               </BoardOpsButton>
               {verificationToken ? (
                 <BoardOpsButton disabled={busy} onClick={verifyLocalEmail}>

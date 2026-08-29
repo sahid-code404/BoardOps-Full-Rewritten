@@ -17,7 +17,10 @@ export class WebApiError extends Error {
   }
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
+export async function apiRequest<T>(
+  path: string,
+  init?: RequestInit,
+): Promise<T> {
   const headers = new Headers(init?.headers);
   if (!headers.has("content-type")) {
     headers.set("content-type", "application/json");
@@ -71,7 +74,7 @@ export interface DeviceSession {
 
 export const authApi = {
   bootstrapDemo: () =>
-    request<{
+    apiRequest<{
       institutionSlug: string;
       identifier: string;
       password: string;
@@ -82,7 +85,7 @@ export const authApi = {
     identifier: string;
     password: string;
   }) =>
-    request<{ accountState: string }>("/auth/login", {
+    apiRequest<{ accountState: string }>("/auth/login", {
       method: "POST",
       body: JSON.stringify({
         ...input,
@@ -98,14 +101,14 @@ export const authApi = {
     email: string;
     password: string;
   }) =>
-    request<{
+    apiRequest<{
       status: string;
       userId: string;
       developmentVerificationToken?: string;
     }>("/auth/register", { method: "POST", body: JSON.stringify(input) }),
 
   verifyEmail: (token: string) =>
-    request<{ status: string }>("/auth/verify-email", {
+    apiRequest<{ status: string }>("/auth/verify-email", {
       method: "POST",
       body: JSON.stringify({ token }),
     }),
@@ -114,32 +117,35 @@ export const authApi = {
     institutionSlug: string;
     identifier: string;
   }) =>
-    request<{ status: string; developmentResetToken?: string }>(
+    apiRequest<{ status: string; developmentResetToken?: string }>(
       "/auth/password-reset/request",
       { method: "POST", body: JSON.stringify(input) },
     ),
 
   confirmPasswordReset: (token: string, newPassword: string) =>
-    request<{ status: string }>("/auth/password-reset/confirm", {
+    apiRequest<{ status: string }>("/auth/password-reset/confirm", {
       method: "POST",
       body: JSON.stringify({ token, newPassword }),
     }),
 
-  me: () => request<MeResponse>("/auth/me"),
+  me: () => apiRequest<MeResponse>("/auth/me"),
 
   logout: () =>
-    request<{ status: string }>("/auth/logout", { method: "POST", body: "{}" }),
+    apiRequest<{ status: string }>("/auth/logout", {
+      method: "POST",
+      body: "{}",
+    }),
 
-  sessions: () => request<{ sessions: DeviceSession[] }>("/auth/sessions"),
+  sessions: () => apiRequest<{ sessions: DeviceSession[] }>("/auth/sessions"),
 
   revokeSession: (sessionId: string) =>
-    request<{ status: string }>(
+    apiRequest<{ status: string }>(
       `/auth/sessions/${encodeURIComponent(sessionId)}`,
       { method: "DELETE" },
     ),
 
   requestOtp: () =>
-    request<{
+    apiRequest<{
       status: string;
       challengeId: string;
       expiresAtMs: number;
@@ -150,13 +156,13 @@ export const authApi = {
     }),
 
   verifyOtp: (challengeId: string, code: string) =>
-    request<{ status: string; verifiedAtMs: number }>("/auth/otp/verify", {
+    apiRequest<{ status: string; verifiedAtMs: number }>("/auth/otp/verify", {
       method: "POST",
       body: JSON.stringify({ challengeId, code }),
     }),
 
   registrations: () =>
-    request<{ registrations: Array<Record<string, unknown>> }>(
+    apiRequest<{ registrations: Array<Record<string, unknown>> }>(
       "/auth/registrations",
     ),
 
@@ -165,7 +171,7 @@ export const authApi = {
     action: "APPROVE" | "REJECT" | "REQUEST_CHANGES",
     reason?: string,
   ) =>
-    request<{ status: string }>(
+    apiRequest<{ status: string }>(
       `/auth/registrations/${encodeURIComponent(userId)}/review`,
       {
         method: "POST",

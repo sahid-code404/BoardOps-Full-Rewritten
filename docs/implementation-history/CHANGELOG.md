@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Phase 05 — Permissions
+
+- Added a canonical institution-scoped permission engine with reusable exact/all/any backend guards.
+- Added effective permission resolution from role inheritance plus direct user overrides with deterministic direct `DENY` precedence.
+- Added D1 permission-engine migration/indexes and canonical `permissions.read` / `permissions.manage` permissions.
+- Added institution-scoped custom-role and user-access administration with cross-institution protection.
+- Added recent STEP_UP enforcement for high-risk permission mutations, mandatory mutation reasons, append-only audit evidence, and self-lockout protection.
+- Added a Web Access Control workspace for role editing, user-role assignment, direct ALLOW/DENY/INHERIT overrides, effective-access visibility, and step-up verification.
+- Added Flutter permission constants, exact/all/any policies, `PermissionGate`, route-redirect behavior, and deterministic tests.
+- Expanded the OpenAPI v1 contract for permission catalog, role, and user-access administration.
+- Added combined authentication + permission E2E smoke coverage for role inheritance, denied actions, direct overrides, step-up protection, auditing, and self-lockout prevention.
+- Corrected a human-review visual-parity defect: the rewrite auth surface had drifted into an oversized marketing split-screen even though the audited reference uses a centered compact strong-glass auth card. The centered BoardOps/Operations Suite card, segmented auth navigation, dense rounded inputs/actions, mesh ambience, and compact authenticated surface rhythm are restored without changing the Phase 04/05 security model.
+- Kept the complete authenticated navigation shell deferred to Phase 06 so menu/search/theme/notification/profile controls are implemented as real functionality rather than visual placeholders.
+
 ### Phase 04 — Authentication foundation
 
 - Added D1 authentication migrations for users, account-state history, password credentials, sessions, verification/reset credentials, OTP challenges, login-attempt throttling, and role/permission foundations.
