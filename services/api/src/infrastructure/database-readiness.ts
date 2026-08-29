@@ -12,7 +12,11 @@ export async function readinessSnapshot(env: CloudflareBindings) {
   }
 
   return {
-    ready: d1 && Boolean(env.FILES) && Boolean(env.EVENT_QUEUE) && Boolean(env.FOUNDATION_WORKFLOW),
+    ready:
+      d1 &&
+      Boolean(env.FILES) &&
+      Boolean(env.EVENT_QUEUE) &&
+      Boolean(env.FOUNDATION_WORKFLOW),
     resources: {
       d1,
       r2: Boolean(env.FILES),
