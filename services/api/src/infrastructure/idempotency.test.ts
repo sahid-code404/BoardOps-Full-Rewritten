@@ -7,7 +7,9 @@ describe("idempotency foundation", () => {
   it("requires an explicit idempotency key", () => {
     expect(() => requireIdempotencyKey(new Headers())).toThrowError(ApiError);
     expect(
-      requireIdempotencyKey(new Headers({ "Idempotency-Key": " operation-1 " })),
+      requireIdempotencyKey(
+        new Headers({ "Idempotency-Key": " operation-1 " }),
+      ),
     ).toBe("operation-1");
   });
 
