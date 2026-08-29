@@ -1,7 +1,8 @@
 openapi: 3.1.0
 info:
   title: BoardOps API
-  version: 0.1.0
+  version: 0.4.0
+  description: Institution-scoped BoardOps API contract.
 servers:
   - url: /api/v1
 paths:
@@ -15,7 +16,301 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthResponse"
+  /auth/register:
+    post:
+      operationId: registerAccount
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegistrationRequest"
+      responses:
+        "201":
+          description: Registration created; email verification is required.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegistrationResponse"
+        "4XX":
+          $ref: "#/components/responses/ApiError"
+  /auth/verify-email:
+    post:
+      operationId: verifyEmail
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token]
+              properties:
+                token: { type: string, minLength: 16, maxLength: 256 }
+      responses:
+        "200":
+          $ref: "#/components/responses/StatusResponse"
+        "4XX":
+          $ref: "#/components/responses/ApiError"
+  /auth/login:
+    post:
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Authenticated session. Web uses an HttpOnly cookie; mobile receives a bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "4XX":
+          $ref: "#/components/responses/ApiError"
+  /auth/me:
+    get:
+      operationId: getCurrentAccount
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Current authenticated principal and session.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeResponse"
+        "401":
+          $ref: "#/components/responses/ApiError"
+  /auth/logout:
+    post:
+      operationId: logout
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        "200":
+          $ref: "#/components/responses/StatusResponse"
+        "401":
+          $ref: "#/components/responses/ApiError"
+  /auth/sessions:
+    get:
+      operationId: listSessions
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: User device/session inventory.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [sessions, requestId]
+                properties:
+                  sessions:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/DeviceSession"
+                  requestId: { type: string }
+        "401":
+          $ref: "#/components/responses/ApiError"
+  /auth/sessions/{sessionId}:
+    delete:
+      operationId: revokeSession
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          $ref: "#/components/responses/StatusResponse"
+        "4XX":
+          $ref: "#/components/responses/ApiError"
+  /auth/otp/request:
+    post:
+      operationId: requestStepUpOtp
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                purpose: { type: string, const: STEP_UP }
+      responses:
+        "200":
+          description: Bounded OTP challenge. Development code is local-only and omitted outside local development.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OtpChallengeResponse"
+        "4XX":
+          $ref: "#/components/responses/ApiError"
+  /auth/otp/verify:
+    post:
+      operationId: verifyStepUpOtp
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [challengeId, code]
+              properties:
+                challengeId: { type: string, minLength: 16, maxLength: 80 }
+                code:
+                  type: string
+                  pattern: "^[0-9]{6}$"
+      responses:
+        "200":
+          description: OTP consumed and current session marked step-up verified.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, purpose, verifiedAtMs, requestId]
+                properties:
+                  status: { type: string, const: verified }
+                  purpose: { type: string, const: STEP_UP }
+                  verifiedAtMs: { type: integer }
+                  requestId: { type: string }
+        "4XX":
+          $ref: "#/components/responses/ApiError"
+  /auth/password-reset/request:
+    post:
+      operationId: requestPasswordReset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [institutionSlug, identifier]
+              properties:
+                institutionSlug: { type: string, minLength: 2, maxLength: 80 }
+                identifier: { type: string, minLength: 2, maxLength: 254 }
+      responses:
+        "200":
+          description: Generic accepted response to avoid account enumeration.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, requestId]
+                properties:
+                  status: { type: string, const: accepted }
+                  developmentResetToken: { type: string }
+                  requestId: { type: string }
+        "4XX":
+          $ref: "#/components/responses/ApiError"
+  /auth/password-reset/confirm:
+    post:
+      operationId: confirmPasswordReset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token, newPassword]
+              properties:
+                token: { type: string, minLength: 16, maxLength: 256 }
+                newPassword: { type: string, minLength: 12, maxLength: 128 }
+      responses:
+        "200":
+          $ref: "#/components/responses/StatusResponse"
+        "4XX":
+          $ref: "#/components/responses/ApiError"
+  /auth/registrations:
+    get:
+      operationId: listPendingRegistrations
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Pending registrations visible to resident.approve.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [registrations, requestId]
+                properties:
+                  registrations:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PendingRegistration"
+                  requestId: { type: string }
+        "4XX":
+          $ref: "#/components/responses/ApiError"
+  /auth/registrations/{userId}/review:
+    post:
+      operationId: reviewRegistration
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action]
+              properties:
+                action:
+                  type: string
+                  enum: [APPROVE, REJECT, REQUEST_CHANGES]
+                reason: { type: string, maxLength: 500 }
+      responses:
+        "200":
+          $ref: "#/components/responses/StatusResponse"
+        "4XX":
+          $ref: "#/components/responses/ApiError"
 components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: boardops_session
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque-session-token
+  responses:
+    ApiError:
+      description: Structured API error.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
+    StatusResponse:
+      description: Successful status response.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [status, requestId]
+            properties:
+              status: { type: string }
+              requestId: { type: string }
   schemas:
     HealthResponse:
       type: object
@@ -25,6 +320,158 @@ components:
         service: { type: string, const: boardops-api }
         apiVersion: { type: string, const: v1 }
         requestId: { type: string }
+    RegistrationRequest:
+      type: object
+      required: [institutionSlug, institutionUserId, displayName, email, password]
+      properties:
+        institutionSlug: { type: string, minLength: 2, maxLength: 80 }
+        institutionUserId: { type: string, minLength: 2, maxLength: 80 }
+        displayName: { type: string, minLength: 2, maxLength: 120 }
+        email: { type: string, format: email, maxLength: 254 }
+        password: { type: string, minLength: 12, maxLength: 128 }
+    RegistrationResponse:
+      type: object
+      required: [status, userId, institution, requestId]
+      properties:
+        status: { type: string, const: verification_required }
+        userId: { type: string }
+        institution:
+          type: object
+          required: [slug, displayName, institutionUserIdLabel]
+          properties:
+            slug: { type: string }
+            displayName: { type: string }
+            institutionUserIdLabel: { type: string }
+        developmentVerificationToken: { type: string }
+        requestId: { type: string }
+    LoginRequest:
+      type: object
+      required: [institutionSlug, identifier, password]
+      properties:
+        institutionSlug: { type: string, minLength: 2, maxLength: 80 }
+        identifier: { type: string, minLength: 2, maxLength: 254 }
+        password: { type: string, minLength: 12, maxLength: 128 }
+        clientType:
+          type: string
+          enum: [WEB, MOBILE]
+          default: WEB
+        deviceName: { type: string, maxLength: 120 }
+    LoginResponse:
+      type: object
+      required: [status, accountState, session, user, requestId]
+      properties:
+        status: { type: string, const: authenticated }
+        accountState: { type: string }
+        session:
+          type: object
+          required: [id, expiresAtMs, stepUpVerifiedAtMs]
+          properties:
+            id: { type: string }
+            expiresAtMs: { type: integer }
+            stepUpVerifiedAtMs:
+              type: [integer, "null"]
+            token:
+              type: string
+              description: Returned only for MOBILE clients.
+        user:
+          type: object
+          required: [id, institutionUserId, displayName, email]
+          properties:
+            id: { type: string }
+            institutionUserId: { type: string }
+            displayName: { type: string }
+            email: { type: string, format: email }
+        requestId: { type: string }
+    MeResponse:
+      type: object
+      required: [user, session, requestId]
+      properties:
+        user:
+          $ref: "#/components/schemas/AuthUser"
+        session:
+          type: object
+          required: [id, clientType, stepUpVerifiedAtMs]
+          properties:
+            id: { type: string }
+            clientType: { type: string, enum: [WEB, MOBILE] }
+            stepUpVerifiedAtMs:
+              type: [integer, "null"]
+        requestId: { type: string }
+    AuthUser:
+      type: object
+      required:
+        - id
+        - institutionId
+        - institutionSlug
+        - institutionUserId
+        - email
+        - displayName
+        - accountState
+        - permissions
+      properties:
+        id: { type: string }
+        institutionId: { type: string }
+        institutionSlug: { type: string }
+        institutionUserId: { type: string }
+        email: { type: string, format: email }
+        displayName: { type: string }
+        accountState: { type: string }
+        permissions:
+          type: array
+          items: { type: string }
+    DeviceSession:
+      type: object
+      required:
+        - id
+        - client_type
+        - created_at_ms
+        - last_seen_at_ms
+        - expires_at_ms
+      properties:
+        id: { type: string }
+        client_type: { type: string, enum: [WEB, MOBILE] }
+        device_name:
+          type: [string, "null"]
+        user_agent:
+          type: [string, "null"]
+        created_at_ms: { type: integer }
+        last_seen_at_ms: { type: integer }
+        expires_at_ms: { type: integer }
+        revoked_at_ms:
+          type: [integer, "null"]
+        step_up_verified_at_ms:
+          type: [integer, "null"]
+    OtpChallengeResponse:
+      type: object
+      required: [status, challengeId, purpose, expiresAtMs, requestId]
+      properties:
+        status: { type: string, const: code_sent }
+        challengeId: { type: string }
+        purpose: { type: string, const: STEP_UP }
+        expiresAtMs: { type: integer }
+        developmentOtpCode:
+          type: string
+          pattern: "^[0-9]{6}$"
+        requestId: { type: string }
+    PendingRegistration:
+      type: object
+      required:
+        - id
+        - institution_user_id
+        - email
+        - display_name
+        - account_state
+        - created_at_ms
+      properties:
+        id: { type: string }
+        institution_user_id: { type: string }
+        email: { type: string, format: email }
+        display_name: { type: string }
+        account_state: { type: string }
+        email_verified_at_ms:
+          type: [integer, "null"]
+        created_at_ms: { type: integer }
+        updated_at_ms: { type: integer }
     ErrorEnvelope:
       type: object
       required: [error]
