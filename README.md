@@ -4,52 +4,52 @@ BoardOps is being rebuilt from scratch as a production-grade institutional mess 
 
 ## Current phase
 
-**Phase 04 — Authentication foundation is runnable and ready for local testing.**
+**Phase 05 — Permissions is runnable and ready for local testing.**
 
-Active implementation branch: `phase/04-authentication-foundation`.
+Active implementation branch: `phase/05-permissions`.
 
-Phases 01–03 are merged into `main`. The existing application at `sahid-code404/BoardOpsv2rewrite` remains a read-only visual and functional reference; legacy framework code is not copied into the rewrite.
+Phases 01–04 are merged into `main`. The existing application at `sahid-code404/BoardOpsv2rewrite` remains a read-only visual and functional reference; legacy framework code is not copied into the rewrite.
 
-Phase 04 adds the first end-to-end identity and session boundary:
+Phase 05 replaces role-name authorization assumptions with one institution-scoped permission engine shared across backend, Web, and Flutter:
 
-- institution-scoped registration with stable Institution User ID;
-- email-verification and approval lifecycle;
-- permission-protected registration review;
-- login throttling and security audit events;
-- server-side revocable sessions;
-- HttpOnly Web session cookies;
-- Flutter bearer sessions stored through OS-backed secure storage;
-- password reset with all-session invalidation;
-- bounded/replay-resistant OTP step-up verification;
-- Web and Flutter authentication/account-security experiences;
-- OpenAPI authentication contract;
-- local D1 authentication smoke testing in CI.
+- canonical permission codes;
+- backend-authoritative exact/all/any permission guards;
+- role inheritance plus direct user ALLOW/DENY overrides;
+- deterministic DENY precedence;
+- institution-scoped role and user-access administration;
+- reasoned and audited permission mutations;
+- recent STEP_UP verification for high-risk access changes;
+- self-lockout protection for `permissions.manage`;
+- immutable system-role protection through the custom-role API;
+- Web Access Control workspace at `/permissions`;
+- Flutter permission policy, visibility, and route-guard primitives;
+- local end-to-end permission smoke coverage in CI.
 
-Phase 04 does not claim that production email delivery, authenticator-app 2FA, permission administration, or production Cloudflare provisioning are complete. Those remain explicit later-phase work.
+Phase 05 does not claim destructive role deletion, break-glass administration, the final application shell/navigation, or later business-domain permission bindings are complete. Those remain explicit later-phase work.
 
-## Verified Phase 04 implementation CI
+## Verified Phase 05 implementation CI
 
-GitHub Actions run `33268045449` verifies the implementation checkpoint with:
+GitHub Actions run `33270319964` passed all required implementation jobs:
 
 - locked dependency installation;
 - formatting and lint;
 - TypeScript plus Wrangler binding generation;
 - Web/API unit tests;
 - local D1 migration verification;
-- authentication end-to-end smoke testing;
+- authentication plus permission end-to-end smoke testing;
 - Web/API builds;
 - Flutter analyze and widget/unit tests;
 - Android debug APK build;
 - iOS no-codesign compile validation.
 
-## Local Phase 04 testing
+## Local Phase 05 testing
 
 From the repository root:
 
 ```bash
 git fetch origin
-git switch phase/04-authentication-foundation
-git pull --ff-only origin phase/04-authentication-foundation
+git switch phase/05-permissions
+git pull --ff-only origin phase/05-permissions
 
 corepack enable
 corepack prepare pnpm@11.23.0 --activate
@@ -57,25 +57,29 @@ pnpm install --frozen-lockfile
 pnpm db:verify:local
 ```
 
-Start the API:
+Start the API and keep this terminal running:
 
 ```bash
 pnpm --filter @boardops/api dev
 ```
 
-In a second terminal, run the complete local authentication smoke test:
+In a second terminal, run the complete authentication + permission smoke test:
 
 ```bash
+cd ~/BoardOps-Full-Rewritten
 pnpm auth:smoke:local
 ```
 
-Then start the Web client:
+The smoke flow verifies authentication regression behavior first, then role inheritance, denied actions, direct DENY, direct ALLOW, recent step-up enforcement, permission mutation auditing, and self-lockout prevention.
+
+Start the Web client in a third terminal:
 
 ```bash
+cd ~/BoardOps-Full-Rewritten
 pnpm --filter @boardops/web dev
 ```
 
-Open `http://localhost:5173/auth`. The Vite development server proxies `/api` to the local Worker at `http://127.0.0.1:8787`.
+Open `http://localhost:5173/auth`.
 
 For manual local sign-in, bootstrap the development-only demo administrator:
 
@@ -85,13 +89,24 @@ curl -s -X POST http://127.0.0.1:8787/api/v1/dev/bootstrap \
   -d '{}'
 ```
 
-The local-only endpoint returns the demo institution/credentials used for manual testing. It is unavailable outside local development.
+Use the returned local demo credentials to sign in. After authentication, open `http://localhost:5173/permissions` or use the permission-aware Access Control entry point from the account page.
 
-To exercise Flutter after installing Flutter 3.47.1 and the appropriate Android/iOS SDK:
+Manual Phase 05 checks should confirm that:
+
+- effective permissions are visible;
+- custom role permissions can be edited only after recent STEP_UP verification;
+- user role assignments require a reason;
+- direct ALLOW/DENY/INHERIT overrides require a reason;
+- a direct DENY wins over role-granted access;
+- an actor cannot remove their own effective `permissions.manage` through ordinary self-service changes;
+- unauthorized actions remain denied by the API even if client UI is manipulated.
+
+To regression-check Flutter after installing Flutter 3.47.1 and the appropriate Android/iOS SDK:
 
 ```bash
 bash scripts/bootstrap-mobile.sh
 cd apps/mobile
+flutter test
 flutter run
 ```
 
@@ -99,10 +114,10 @@ iOS device/simulator work requires macOS/Xcode. Android requires an Android SDK 
 
 ## Security notes
 
-Web browser sessions use an HttpOnly cookie; Flutter durable tokens use `flutter_secure_storage`. Development verification/reset/OTP values are exposed only when both the environment is development and the request host is local. Do not turn those development conveniences into production behavior.
+Permission checks are backend-authoritative and fail closed. Client-side visibility is convenience only. Permission mutations are institution-scoped, online-only, audited, reasoned where required, and protected by recent STEP_UP verification for high-risk changes. Web browser sessions remain HttpOnly cookies and Flutter durable tokens remain in OS-backed secure storage.
 
 ## Remote deployment warning
 
-Staging/production Cloudflare resources and authentication email delivery are not provisioned by Phase 04. The D1 IDs in `services/api/wrangler.jsonc` remain deliberate placeholder UUIDs. Do not run remote migrations/deployments until real environment-specific resources exist and the non-secret resource IDs are configured.
+Staging/production Cloudflare resources are not provisioned by Phase 05. The D1 IDs in `services/api/wrangler.jsonc` remain deliberate placeholder UUIDs. Do not run remote migrations or deployments until real environment-specific resources are configured.
 
-See `docs/architecture/AUTHENTICATION.md` and `docs/decisions/ADR-015-AUTHENTICATION-SESSION-SECURITY.md` for the Phase 04 architecture and security decisions.
+See `docs/architecture/PERMISSIONS.md`, `docs/decisions/ADR-016-PERMISSION-ENGINE.md`, `docs/api/CONTRACT.md`, and `docs/implementation-history/PHASE-05-permissions.md` for the Phase 05 design and verification record.
