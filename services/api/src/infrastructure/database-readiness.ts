@@ -3,13 +3,16 @@ export async function isDatabaseReady(db: D1Database): Promise<boolean> {
   return row?.ok === 1;
 }
 
-export async function readinessSnapshot(env: CloudflareBindings) {
-  let d1 = false;
+async function safeDatabaseReadiness(db: D1Database): Promise<boolean> {
   try {
-    d1 = await isDatabaseReady(env.DB);
+    return await isDatabaseReady(db);
   } catch {
-    d1 = false;
+    return false;
   }
+}
+
+export async function readinessSnapshot(env: CloudflareBindings) {
+  const d1 = await safeDatabaseReadiness(env.DB);
 
   return {
     ready:
