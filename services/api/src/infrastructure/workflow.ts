@@ -1,5 +1,5 @@
-import { WorkflowEntrypoint, WorkflowStep } from "cloudflare:workers";
-import type { WorkflowEvent } from "cloudflare:workers";
+import { WorkflowEntrypoint } from "cloudflare:workers";
+import type { WorkflowEvent, WorkflowStep } from "cloudflare:workers";
 
 export interface FoundationWorkflowParams {
   operationId: string;
