@@ -4,7 +4,7 @@ BoardOps is being rebuilt from scratch as a production-grade institutional mess 
 
 ## Current phase
 
-**Phase 05 — Permissions remains open while the reference visual-parity correction is verified.**
+**Phase 05 — Permissions is runnable again after the reference visual-parity correction. Local human review is the remaining acceptance gate.**
 
 Active implementation branch: `phase/05-permissions`.
 
@@ -27,7 +27,7 @@ Phase 05 replaces role-name authorization assumptions with one institution-scope
 
 ## Reference visual parity correction
 
-Human review identified that the first rewrite presentation preserved the purple/graphite/glass palette but did not preserve the reference composition closely enough. The branch is being corrected against the audited reference commit `77f3dec3b264c42904207f27c5f008b33c03b868`.
+Human review identified that the first rewrite presentation preserved the purple/graphite/glass palette but did not preserve the reference composition closely enough. The branch was corrected against the audited reference commit `77f3dec3b264c42904207f27c5f008b33c03b868`.
 
 The corrected Web direction now preserves the reference rules that matter visually:
 
@@ -42,13 +42,13 @@ The complete reusable authenticated shell—menu, search, theme, notifications, 
 
 ## Verification status
 
-The permission-engine implementation passed GitHub Actions run `33270844042` across Web/API, authentication + permission E2E smoke, D1 verification, Android, and iOS before this later visual correction.
+The visual-parity-corrected exact head `7fd5e673ede098b1aa1040327c141351b5c6fb69` passed pull-request GitHub Actions run `33271749245` across Web/API, authentication + permission E2E smoke, D1 verification, Android, and iOS.
 
-A new exact-head CI run is required for the visual-parity-corrected branch before local acceptance resumes.
+The branch is therefore runnable for the local visual/interaction acceptance pass. PR #7 remains open and must not be merged until that human review is accepted.
 
 ## Local development
 
-Once the branch returns to `RUNNABLE — TEST NOW`, the normal local flow remains intentionally short. This Fedora setup does not require Corepack when `pnpm 11.23.0` is already installed.
+This Fedora setup does not require Corepack when `pnpm 11.23.0` is already installed.
 
 Typical commands are:
 
@@ -66,7 +66,7 @@ pnpm auth:smoke:local
 pnpm --filter @boardops/web dev
 ```
 
-Do not use the local testing instructions as an acceptance signal until this README and the Phase 05 history both say `RUNNABLE — TEST NOW` again.
+Manual review should cover `/auth`, `/account`, and `/permissions`, with the reference repository used as the visual baseline.
 
 ## Security notes
 
@@ -80,4 +80,4 @@ See `docs/architecture/PERMISSIONS.md`, `docs/decisions/ADR-016-PERMISSION-AUTHO
 
 ## Checkpoint
 
-NOT READY — CONTINUE FIXING
+RUNNABLE — TEST NOW
