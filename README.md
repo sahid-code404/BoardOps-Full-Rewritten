@@ -4,11 +4,11 @@ BoardOps is being rebuilt from scratch as a production-grade institutional mess 
 
 ## Current phase
 
-**Phase 05 — Permissions is runnable and ready for local testing.**
+**Phase 05 — Permissions remains open while the reference visual-parity correction is verified.**
 
 Active implementation branch: `phase/05-permissions`.
 
-Phases 01–04 are merged into `main`. The existing application at `sahid-code404/BoardOpsv2rewrite` remains a read-only visual and functional reference; legacy framework code is not copied into the rewrite.
+Phases 01–04 are merged into `main`. The existing application at `sahid-code404/BoardOpsv2rewrite` remains the read-only visual and functional reference; legacy framework code is not copied into the rewrite.
 
 Phase 05 replaces role-name authorization assumptions with one institution-scoped permission engine shared across backend, Web, and Flutter:
 
@@ -25,92 +25,48 @@ Phase 05 replaces role-name authorization assumptions with one institution-scope
 - Flutter permission policy, visibility, and route-guard primitives;
 - local end-to-end permission smoke coverage in CI.
 
-Phase 05 does not claim destructive role deletion, break-glass administration, the final application shell/navigation, or later business-domain permission bindings are complete. Those remain explicit later-phase work.
+## Reference visual parity correction
 
-## Verified Phase 05 implementation CI
+Human review identified that the first rewrite presentation preserved the purple/graphite/glass palette but did not preserve the reference composition closely enough. The branch is being corrected against the audited reference commit `77f3dec3b264c42904207f27c5f008b33c03b868`.
 
-GitHub Actions run `33270319964` passed all required implementation jobs:
+The corrected Web direction now preserves the reference rules that matter visually:
 
-- locked dependency installation;
-- formatting and lint;
-- TypeScript plus Wrangler binding generation;
-- Web/API unit tests;
-- local D1 migration verification;
-- authentication plus permission end-to-end smoke testing;
-- Web/API builds;
-- Flutter analyze and widget/unit tests;
-- Android debug APK build;
-- iOS no-codesign compile validation.
+- centered compact authentication instead of a marketing split-screen;
+- BoardOps/Operations Suite identity inside the strong glass auth card;
+- compact segmented Sign in/Register control;
+- dense rounded glass inputs and actions;
+- animated mesh ambience behind content;
+- compact authenticated page chrome and card density instead of oversized landing-page headings.
 
-## Local Phase 05 testing
+The complete reusable authenticated shell—menu, search, theme, notifications, profile chrome, responsive navigation, and permission-aware navigation—belongs to Phase 06 and will be implemented as real functionality rather than non-functional visual placeholders.
 
-From the repository root:
+## Verification status
+
+The permission-engine implementation passed GitHub Actions run `33270844042` across Web/API, authentication + permission E2E smoke, D1 verification, Android, and iOS before this later visual correction.
+
+A new exact-head CI run is required for the visual-parity-corrected branch before local acceptance resumes.
+
+## Local development
+
+Once the branch returns to `RUNNABLE — TEST NOW`, the normal local flow remains intentionally short. This Fedora setup does not require Corepack when `pnpm 11.23.0` is already installed.
+
+Typical commands are:
 
 ```bash
-git fetch origin
-git switch phase/05-permissions
 git pull --ff-only origin phase/05-permissions
-
-corepack enable
-corepack prepare pnpm@11.23.0 --activate
 pnpm install --frozen-lockfile
 pnpm db:verify:local
-```
-
-Start the API and keep this terminal running:
-
-```bash
 pnpm --filter @boardops/api dev
 ```
 
-In a second terminal, run the complete authentication + permission smoke test:
+Then, in another terminal:
 
 ```bash
-cd ~/BoardOps-Full-Rewritten
 pnpm auth:smoke:local
-```
-
-The smoke flow verifies authentication regression behavior first, then role inheritance, denied actions, direct DENY, direct ALLOW, recent step-up enforcement, permission mutation auditing, and self-lockout prevention.
-
-Start the Web client in a third terminal:
-
-```bash
-cd ~/BoardOps-Full-Rewritten
 pnpm --filter @boardops/web dev
 ```
 
-Open `http://localhost:5173/auth`.
-
-For manual local sign-in, bootstrap the development-only demo administrator:
-
-```bash
-curl -s -X POST http://127.0.0.1:8787/api/v1/dev/bootstrap \
-  -H 'content-type: application/json' \
-  -d '{}'
-```
-
-Use the returned local demo credentials to sign in. After authentication, open `http://localhost:5173/permissions` or use the permission-aware Access Control entry point from the account page.
-
-Manual Phase 05 checks should confirm that:
-
-- effective permissions are visible;
-- custom role permissions can be edited only after recent STEP_UP verification;
-- user role assignments require a reason;
-- direct ALLOW/DENY/INHERIT overrides require a reason;
-- a direct DENY wins over role-granted access;
-- an actor cannot remove their own effective `permissions.manage` through ordinary self-service changes;
-- unauthorized actions remain denied by the API even if client UI is manipulated.
-
-To regression-check Flutter after installing Flutter 3.47.1 and the appropriate Android/iOS SDK:
-
-```bash
-bash scripts/bootstrap-mobile.sh
-cd apps/mobile
-flutter test
-flutter run
-```
-
-iOS device/simulator work requires macOS/Xcode. Android requires an Android SDK plus a connected device or emulator.
+Do not use the local testing instructions as an acceptance signal until this README and the Phase 05 history both say `RUNNABLE — TEST NOW` again.
 
 ## Security notes
 
@@ -120,4 +76,8 @@ Permission checks are backend-authoritative and fail closed. Client-side visibil
 
 Staging/production Cloudflare resources are not provisioned by Phase 05. The D1 IDs in `services/api/wrangler.jsonc` remain deliberate placeholder UUIDs. Do not run remote migrations or deployments until real environment-specific resources are configured.
 
-See `docs/architecture/PERMISSIONS.md`, `docs/decisions/ADR-016-PERMISSION-ENGINE.md`, `docs/api/CONTRACT.md`, and `docs/implementation-history/PHASE-05-permissions.md` for the Phase 05 design and verification record.
+See `docs/architecture/PERMISSIONS.md`, `docs/decisions/ADR-016-PERMISSION-AUTHORIZATION.md`, `docs/api/CONTRACT.md`, and `docs/implementation-history/PHASE-05-permissions.md` for the Phase 05 design and verification record.
+
+## Checkpoint
+
+NOT READY — CONTINUE FIXING
