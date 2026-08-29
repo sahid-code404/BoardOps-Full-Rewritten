@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router";
 import { AccountPage } from "../features/auth/AccountPage";
 import { AuthPage } from "../features/auth/AuthPage";
 import { FoundationPage } from "../features/foundation/FoundationPage";
+import { PermissionsPage } from "../features/permissions/PermissionsPage";
 
 export function App() {
   return (
@@ -10,6 +11,7 @@ export function App() {
       <Route path="/" element={<Navigate to="/auth" replace />} />
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/account" element={<AccountPage />} />
+      <Route path="/permissions" element={<PermissionsPage />} />
       <Route path="/design" element={<FoundationPage />} />
       <Route path="*" element={<Navigate to="/auth" replace />} />
     </Routes>
