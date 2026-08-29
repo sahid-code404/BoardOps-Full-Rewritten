@@ -13,6 +13,7 @@
     "db:migrate:local": "pnpm --filter @boardops/api db:migrate:local",
     "db:verify:local": "pnpm --filter @boardops/api db:verify:local",
     "auth:smoke:local": "node scripts/auth-smoke.mjs",
+    "permissions:smoke:local": "node scripts/permissions-smoke.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
