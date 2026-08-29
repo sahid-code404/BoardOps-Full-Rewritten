@@ -20,6 +20,7 @@ interface SessionRow {
   display_name: string;
   account_state: AccountState;
   client_type: ClientType;
+  step_up_verified_at_ms: number | null;
 }
 
 function bearerToken(c: Context<AppEnv>): string | undefined {
@@ -89,7 +90,8 @@ export async function resolvePrincipal(
          u.email,
          u.display_name,
          u.account_state,
-         s.client_type
+         s.client_type,
+         s.step_up_verified_at_ms
        FROM sessions s
        JOIN users u ON u.id = s.user_id
        JOIN institutions i ON i.id = u.institution_id
@@ -117,6 +119,7 @@ export async function resolvePrincipal(
     displayName: row.display_name,
     accountState: row.account_state,
     clientType: row.client_type,
+    stepUpVerifiedAtMs: row.step_up_verified_at_ms,
     permissions: await permissionsForUser(c.env.DB, row.user_id),
   };
 }

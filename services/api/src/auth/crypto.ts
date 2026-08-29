@@ -83,6 +83,10 @@ function constantTimeEqual(left: Uint8Array, right: Uint8Array): boolean {
   return difference === 0;
 }
 
+export function constantTimeTextEqual(left: string, right: string): boolean {
+  return constantTimeEqual(encoder.encode(left), encoder.encode(right));
+}
+
 export async function verifyPassword(
   password: string,
   storedHash: string,

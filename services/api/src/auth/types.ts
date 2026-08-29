@@ -23,6 +23,7 @@ export interface AuthPrincipal {
   displayName: string;
   accountState: AccountState;
   clientType: ClientType;
+  stepUpVerifiedAtMs: number | null;
   permissions: string[];
 }
 

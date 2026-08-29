@@ -137,6 +137,7 @@ sessionRoutes.post("/login", async (c) => {
     session: {
       id: session.sessionId,
       expiresAtMs: session.expiresAtMs,
+      stepUpVerifiedAtMs: null,
       ...(requestedClientType === "MOBILE" ? { token: session.rawToken } : {}),
     },
     user: {
@@ -165,6 +166,7 @@ sessionRoutes.get("/me", requireAuth, (c) => {
     session: {
       id: principal.sessionId,
       clientType: principal.clientType,
+      stepUpVerifiedAtMs: principal.stepUpVerifiedAtMs,
     },
     requestId: c.get("requestId"),
   });
@@ -189,7 +191,7 @@ sessionRoutes.get("/sessions", requireAuth, async (c) => {
   const rows = await c.env.DB
     .prepare(
       `SELECT id, client_type, device_name, user_agent, created_at_ms,
-              last_seen_at_ms, expires_at_ms, revoked_at_ms
+              last_seen_at_ms, expires_at_ms, revoked_at_ms, step_up_verified_at_ms
        FROM sessions
        WHERE user_id = ?
        ORDER BY created_at_ms DESC
