@@ -7,6 +7,7 @@ import { devRoutes } from "./dev/routes";
 import { apiErrorResponse } from "./http/error-response";
 import { readinessSnapshot } from "./infrastructure/database-readiness";
 import { requestLogging } from "./observability/request-logging";
+import { permissionRoutes } from "./permissions/routes";
 
 export const app = new Hono<AppEnv>();
 
@@ -45,6 +46,7 @@ app.get("/api/v1/meta", (c) =>
 );
 
 app.route("/api/v1/auth", authRoutes);
+app.route("/api/v1/permissions", permissionRoutes);
 app.route("/api/v1/dev", devRoutes);
 
 app.notFound((c) =>
