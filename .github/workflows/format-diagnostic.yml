@@ -24,7 +24,15 @@ jobs:
           corepack enable
           corepack prepare pnpm@11.23.0 --activate
       - run: pnpm install --frozen-lockfile
-      - name: Format new Phase 04 sources and print patch
+      - name: Format new Phase 04 sources
         run: |
           pnpm prettier --write services/api/src/auth services/api/src/dev apps/web/src/features/auth apps/web/src/styles/auth.css
-          git diff --no-color -- services/api/src/auth services/api/src/dev apps/web/src/features/auth apps/web/src/styles/auth.css
+      - uses: actions/upload-artifact@v4
+        with:
+          name: phase04-formatted-sources
+          path: |
+            services/api/src/auth
+            services/api/src/dev
+            apps/web/src/features/auth
+            apps/web/src/styles/auth.css
+          if-no-files-found: error
