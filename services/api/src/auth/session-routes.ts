@@ -93,7 +93,7 @@ sessionRoutes.post("/login", async (c) => {
   if (!user || !passwordValid) {
     await recordLoginFailure(c.env.DB, throttleKey);
     await auditStatement(c.env.DB, {
-      institutionId: user?.institution_id,
+      ...(user ? { institutionId: user.institution_id } : {}),
       actorRef: user?.id ?? `auth-attempt:${throttleKey}`,
       action: "auth.login.failed",
       entityType: "authentication_attempt",
