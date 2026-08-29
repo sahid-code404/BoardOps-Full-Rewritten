@@ -1,13 +1,13 @@
 pnpm-lock.yaml
 apps/mobile/pubspec.lock
-.github/workflows/ci.yml
+.github/workflows/
 apps/mobile/lib/design/design_tokens.dart
 packages/design-tokens/web/tokens.css
 scripts/generate-design-tokens.mjs
 apps/web/src/features/foundation/FoundationPage.tsx
 apps/web/src/styles/base.css
 
-# Temporary Phase 04 diagnostic exclusions; remove before the phase PR.
+# Temporary Phase 04 normalization exclusions; remove before the phase PR.
 services/api/src/auth/
 services/api/src/dev/
 apps/web/src/features/auth/
