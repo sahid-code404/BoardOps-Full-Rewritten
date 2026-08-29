@@ -1,10 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { ApiError } from "../http/api-error";
-import {
-  hashIdempotencyPayload,
-  requireIdempotencyKey,
-} from "./idempotency";
+import { hashIdempotencyPayload, requireIdempotencyKey } from "./idempotency";
 
 describe("idempotency foundation", () => {
   it("requires an explicit idempotency key", () => {
