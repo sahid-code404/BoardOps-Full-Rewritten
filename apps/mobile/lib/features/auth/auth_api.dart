@@ -19,17 +19,18 @@ class AuthApiException implements Exception {
 
 class AuthApi {
   AuthApi({Dio? dio})
-      : _dio = dio ??
-            Dio(
-              BaseOptions(
-                baseUrl: boardOpsApiBaseUrl,
-                connectTimeout: const Duration(seconds: 8),
-                receiveTimeout: const Duration(seconds: 12),
-                headers: const <String, String>{
-                  'content-type': 'application/json',
-                },
-              ),
-            );
+    : _dio =
+          dio ??
+          Dio(
+            BaseOptions(
+              baseUrl: boardOpsApiBaseUrl,
+              connectTimeout: const Duration(seconds: 8),
+              receiveTimeout: const Duration(seconds: 12),
+              headers: const <String, String>{
+                'content-type': 'application/json',
+              },
+            ),
+          );
 
   final Dio _dio;
 
@@ -49,8 +50,10 @@ class AuthApi {
         'deviceName': deviceName,
       },
     );
-    final Map<String, dynamic> session =
-        _jsonMap(body['session'], field: 'session');
+    final Map<String, dynamic> session = _jsonMap(
+      body['session'],
+      field: 'session',
+    );
     final String? token = session['token'] as String?;
     final int? expiresAtMs = (session['expiresAtMs'] as num?)?.toInt();
     if (token == null || expiresAtMs == null) {
@@ -86,10 +89,7 @@ class AuthApi {
   }
 
   Future<void> verifyEmail(String token) async {
-    await _post(
-      '/auth/verify-email',
-      data: <String, dynamic>{'token': token},
-    );
+    await _post('/auth/verify-email', data: <String, dynamic>{'token': token});
   }
 
   Future<PasswordResetRequestResult> requestPasswordReset({
@@ -121,23 +121,20 @@ class AuthApi {
   Future<AuthSession> me(String token) async {
     final Map<String, dynamic> body = await _get('/auth/me', token: token);
     final Map<String, dynamic> userJson = _jsonMap(body['user'], field: 'user');
-    final Map<String, dynamic> sessionJson =
-        _jsonMap(body['session'], field: 'session');
+    final Map<String, dynamic> sessionJson = _jsonMap(
+      body['session'],
+      field: 'session',
+    );
     return AuthSession(
       user: AuthUser.fromJson(userJson),
       sessionId: sessionJson['id'] as String,
       clientType: sessionJson['clientType'] as String,
-      stepUpVerifiedAtMs:
-          (sessionJson['stepUpVerifiedAtMs'] as num?)?.toInt(),
+      stepUpVerifiedAtMs: (sessionJson['stepUpVerifiedAtMs'] as num?)?.toInt(),
     );
   }
 
   Future<void> logout(String token) async {
-    await _post(
-      '/auth/logout',
-      token: token,
-      data: const <String, dynamic>{},
-    );
+    await _post('/auth/logout', token: token, data: const <String, dynamic>{});
   }
 
   Future<OtpChallenge> requestOtp(String token) async {
@@ -166,7 +163,10 @@ class AuthApi {
   }
 
   Future<List<DeviceSession>> sessions(String token) async {
-    final Map<String, dynamic> body = await _get('/auth/sessions', token: token);
+    final Map<String, dynamic> body = await _get(
+      '/auth/sessions',
+      token: token,
+    );
     final List<dynamic> raw = body['sessions'] as List<dynamic>? ?? <dynamic>[];
     return raw
         .map((dynamic value) => DeviceSession.fromJson(_jsonMap(value)))
@@ -174,7 +174,10 @@ class AuthApi {
   }
 
   Future<void> revokeSession(String token, String sessionId) async {
-    await _delete('/auth/sessions/${Uri.encodeComponent(sessionId)}', token: token);
+    await _delete(
+      '/auth/sessions/${Uri.encodeComponent(sessionId)}',
+      token: token,
+    );
   }
 
   Future<Map<String, dynamic>> _get(String path, {String? token}) async {

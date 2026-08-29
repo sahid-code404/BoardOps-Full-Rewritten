@@ -15,7 +15,7 @@ abstract interface class AuthTokenStorage {
 
 class SecureAuthTokenStorage implements AuthTokenStorage {
   SecureAuthTokenStorage({FlutterSecureStorage? storage})
-      : _storage = storage ?? const FlutterSecureStorage();
+    : _storage = storage ?? const FlutterSecureStorage();
 
   static const String _tokenKey = 'boardops.auth.token';
   static const String _expiryKey = 'boardops.auth.expires_at_ms';
@@ -34,10 +34,7 @@ class SecureAuthTokenStorage implements AuthTokenStorage {
   @override
   Future<void> write(StoredAuthToken value) async {
     await _storage.write(key: _tokenKey, value: value.token);
-    await _storage.write(
-      key: _expiryKey,
-      value: value.expiresAtMs.toString(),
-    );
+    await _storage.write(key: _expiryKey, value: value.expiresAtMs.toString());
   }
 
   @override

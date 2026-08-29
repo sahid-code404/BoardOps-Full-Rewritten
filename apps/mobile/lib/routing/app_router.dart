@@ -5,10 +5,7 @@ import '../features/foundation/foundation_screen.dart';
 
 final GoRouter appRouter = GoRouter(
   routes: <RouteBase>[
-    GoRoute(
-      path: '/',
-      builder: (context, state) => const AuthGate(),
-    ),
+    GoRoute(path: '/', builder: (context, state) => const AuthGate()),
     GoRoute(
       path: '/foundation',
       builder: (context, state) => const FoundationScreen(),

@@ -322,7 +322,8 @@ components:
         requestId: { type: string }
     RegistrationRequest:
       type: object
-      required: [institutionSlug, institutionUserId, displayName, email, password]
+      required:
+        [institutionSlug, institutionUserId, displayName, email, password]
       properties:
         institutionSlug: { type: string, minLength: 2, maxLength: 80 }
         institutionUserId: { type: string, minLength: 2, maxLength: 80 }

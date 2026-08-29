@@ -42,7 +42,10 @@ const bootstrap = await request("/dev/bootstrap", {
   body: {},
 });
 const demo = bootstrap.payload;
-assert(demo.institutionSlug && demo.identifier && demo.password, "Demo bootstrap is incomplete.");
+assert(
+  demo.institutionSlug && demo.identifier && demo.password,
+  "Demo bootstrap is incomplete.",
+);
 
 const adminLogin = await request("/auth/login", {
   method: "POST",
@@ -57,7 +60,10 @@ const adminLogin = await request("/auth/login", {
 const adminCookie = cookieFrom(adminLogin.response);
 
 const adminMe = await request("/auth/me", { cookie: adminCookie });
-assert(adminMe.payload.user.accountState === "ACTIVE", "Demo administrator must be active.");
+assert(
+  adminMe.payload.user.accountState === "ACTIVE",
+  "Demo administrator must be active.",
+);
 assert(
   adminMe.payload.user.permissions.includes("resident.approve"),
   "Demo administrator must be able to review registrations.",
@@ -94,7 +100,9 @@ assert(
   "Step-up verification timestamp missing.",
 );
 
-console.log("BoardOps authentication smoke: registration, verification, and approval");
+console.log(
+  "BoardOps authentication smoke: registration, verification, and approval",
+);
 const suffix = `${Date.now()}-${Math.floor(Math.random() * 10000)}`;
 const institutionUserId = `smoke-${suffix}`;
 const email = `${institutionUserId}@boardops.local`;
@@ -144,14 +152,23 @@ const residentLogin = await request("/auth/login", {
 });
 let residentCookie = cookieFrom(residentLogin.response);
 const residentMe = await request("/auth/me", { cookie: residentCookie });
-assert(residentMe.payload.user.accountState === "ACTIVE", "Approved resident must be active.");
+assert(
+  residentMe.payload.user.accountState === "ACTIVE",
+  "Approved resident must be active.",
+);
 
 console.log("BoardOps authentication smoke: password reset and revocation");
 const resetRequest = await request("/auth/password-reset/request", {
   method: "POST",
-  body: { institutionSlug: demo.institutionSlug, identifier: institutionUserId },
+  body: {
+    institutionSlug: demo.institutionSlug,
+    identifier: institutionUserId,
+  },
 });
-assert(resetRequest.payload.developmentResetToken, "Local password reset token missing.");
+assert(
+  resetRequest.payload.developmentResetToken,
+  "Local password reset token missing.",
+);
 await request("/auth/password-reset/confirm", {
   method: "POST",
   body: {
@@ -172,13 +189,19 @@ const residentRelogin = await request("/auth/login", {
   },
 });
 residentCookie = cookieFrom(residentRelogin.response);
-const residentAfterReset = await request("/auth/me", { cookie: residentCookie });
+const residentAfterReset = await request("/auth/me", {
+  cookie: residentCookie,
+});
 const residentSessionId = residentAfterReset.payload.session.id;
 assert(residentSessionId, "Resident session ID missing after password reset.");
 
-const residentSessions = await request("/auth/sessions", { cookie: residentCookie });
+const residentSessions = await request("/auth/sessions", {
+  cookie: residentCookie,
+});
 assert(
-  residentSessions.payload.sessions.some((entry) => entry.id === residentSessionId),
+  residentSessions.payload.sessions.some(
+    (entry) => entry.id === residentSessionId,
+  ),
   "Current resident session not listed.",
 );
 await request(`/auth/sessions/${residentSessionId}`, {

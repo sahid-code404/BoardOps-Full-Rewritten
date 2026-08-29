@@ -45,7 +45,10 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
     } on AuthApiException catch (error) {
       if (mounted) setState(() => _message = error.message);
     } catch (_) {
-      if (mounted) setState(() => _message = 'The security operation could not be completed.');
+      if (mounted)
+        setState(
+          () => _message = 'The security operation could not be completed.',
+        );
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -53,8 +56,9 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
 
   Future<void> _loadSessions() async {
     try {
-      final List<DeviceSession> sessions =
-          await ref.read(authControllerProvider.notifier).sessions();
+      final List<DeviceSession> sessions = await ref
+          .read(authControllerProvider.notifier)
+          .sessions();
       if (mounted) setState(() => _sessions = sessions);
     } catch (_) {
       if (mounted) setState(() => _sessions = const <DeviceSession>[]);
@@ -62,29 +66,29 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
   }
 
   Future<void> _requestOtp() => _perform(() async {
-        final OtpChallenge challenge =
-            await ref.read(authControllerProvider.notifier).requestOtp();
-        _otpCode.text = challenge.developmentCode ?? '';
-        setState(() {
-          _challenge = challenge;
-          _message = 'Verification code issued. It expires in five minutes.';
-        });
-      });
+    final OtpChallenge challenge = await ref
+        .read(authControllerProvider.notifier)
+        .requestOtp();
+    _otpCode.text = challenge.developmentCode ?? '';
+    setState(() {
+      _challenge = challenge;
+      _message = 'Verification code issued. It expires in five minutes.';
+    });
+  });
 
   Future<void> _verifyOtp() => _perform(() async {
-        final OtpChallenge? challenge = _challenge;
-        if (challenge == null) return;
-        await ref.read(authControllerProvider.notifier).verifyOtp(
-              challengeId: challenge.challengeId,
-              code: _otpCode.text,
-            );
-        setState(() {
-          _challenge = null;
-          _otpCode.clear();
-          _message = 'Step-up verification complete for this session.';
-        });
-        await _loadSessions();
-      });
+    final OtpChallenge? challenge = _challenge;
+    if (challenge == null) return;
+    await ref
+        .read(authControllerProvider.notifier)
+        .verifyOtp(challengeId: challenge.challengeId, code: _otpCode.text);
+    setState(() {
+      _challenge = null;
+      _otpCode.clear();
+      _message = 'Step-up verification complete for this session.';
+    });
+    await _loadSessions();
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -111,15 +115,19 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                       TextButton.icon(
                         onPressed: _busy
                             ? null
-                            : () => ref.read(authControllerProvider.notifier).logout(),
+                            : () => ref
+                                  .read(authControllerProvider.notifier)
+                                  .logout(),
                         icon: const Icon(Icons.logout_rounded),
                         label: const Text('Sign out'),
                       ),
                     ],
                   ),
                   const SizedBox(height: 18),
-                  Text('Welcome, ${user.displayName}',
-                      style: Theme.of(context).textTheme.displaySmall),
+                  Text(
+                    'Welcome, ${user.displayName}',
+                    style: Theme.of(context).textTheme.displaySmall,
+                  ),
                   const SizedBox(height: 8),
                   Text('${user.institutionUserId} · ${user.email}'),
                   const SizedBox(height: 24),
@@ -133,8 +141,12 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              Text('Account lifecycle',
-                                  style: Theme.of(context).textTheme.headlineSmall),
+                              Text(
+                                'Account lifecycle',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headlineSmall,
+                              ),
                               const SizedBox(height: 10),
                               BoardOpsStatusChip(
                                 label: user.accountState.replaceAll('_', ' '),
@@ -143,7 +155,9 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                                     : BoardOpsStatusTone.warning,
                               ),
                               const SizedBox(height: 16),
-                              Text('${user.permissions.length} effective permissions'),
+                              Text(
+                                '${user.permissions.length} effective permissions',
+                              ),
                               const SizedBox(height: 6),
                               Text(
                                 'Identity and authorization remain separate. Phase 05 expands the permission engine without changing this secure session contract.',
@@ -159,8 +173,12 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: <Widget>[
-                              Text('Step-up verification',
-                                  style: Theme.of(context).textTheme.headlineSmall),
+                              Text(
+                                'Step-up verification',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headlineSmall,
+                              ),
                               const SizedBox(height: 10),
                               Text(
                                 session.stepUpVerifiedAtMs == null
@@ -184,7 +202,8 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                               ] else ...<Widget>[
                                 const SizedBox(height: 14),
                                 FilledButton.tonal(
-                                  onPressed: _busy || user.accountState != 'ACTIVE'
+                                  onPressed:
+                                      _busy || user.accountState != 'ACTIVE'
                                       ? null
                                       : _requestOtp,
                                   child: const Text('Request one-time code'),
@@ -207,8 +226,10 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                       children: <Widget>[
                         Row(
                           children: <Widget>[
-                            Text('Devices & sessions',
-                                style: Theme.of(context).textTheme.headlineSmall),
+                            Text(
+                              'Devices & sessions',
+                              style: Theme.of(context).textTheme.headlineSmall,
+                            ),
                             const Spacer(),
                             IconButton(
                               onPressed: _loadSessions,
@@ -243,11 +264,14 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                                       onPressed: _busy
                                           ? null
                                           : () => _perform(() async {
-                                                await ref
-                                                    .read(authControllerProvider.notifier)
-                                                    .revokeSession(item.id);
-                                                await _loadSessions();
-                                              }),
+                                              await ref
+                                                  .read(
+                                                    authControllerProvider
+                                                        .notifier,
+                                                  )
+                                                  .revokeSession(item.id);
+                                              await _loadSessions();
+                                            }),
                                       icon: const Icon(Icons.block_rounded),
                                     )
                                   : const BoardOpsStatusChip(

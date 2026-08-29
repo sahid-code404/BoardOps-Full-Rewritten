@@ -39,7 +39,8 @@ class AuthController extends Notifier<AuthState> {
   Future<void> _restoreSession() async {
     try {
       final StoredAuthToken? stored = await _storage.read();
-      if (stored == null || stored.expiresAtMs <= DateTime.now().millisecondsSinceEpoch) {
+      if (stored == null ||
+          stored.expiresAtMs <= DateTime.now().millisecondsSinceEpoch) {
         if (stored != null) await _storage.clear();
         state = const AuthState();
         return;
@@ -156,9 +157,12 @@ class AuthController extends Notifier<AuthState> {
 
   Future<StoredAuthToken> _requireStoredToken() async {
     final StoredAuthToken? stored = await _storage.read();
-    if (stored == null || stored.expiresAtMs <= DateTime.now().millisecondsSinceEpoch) {
+    if (stored == null ||
+        stored.expiresAtMs <= DateTime.now().millisecondsSinceEpoch) {
       await _storage.clear();
-      state = const AuthState(error: 'Your session has expired. Sign in again.');
+      state = const AuthState(
+        error: 'Your session has expired. Sign in again.',
+      );
       throw const AuthApiException('Your session has expired. Sign in again.');
     }
     return stored;

@@ -59,70 +59,77 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     } on AuthApiException catch (error) {
       setState(() => _message = error.message);
     } catch (_) {
-      setState(() => _message = 'Unable to complete the authentication request.');
+      setState(
+        () => _message = 'Unable to complete the authentication request.',
+      );
     } finally {
       if (mounted) setState(() => _busy = false);
     }
   }
 
   Future<void> _login() => _run(() async {
-        await ref.read(authControllerProvider.notifier).login(
-              institutionSlug: _institution.text,
-              identifier: _identifier.text,
-              password: _password.text,
-            );
-      });
+    await ref
+        .read(authControllerProvider.notifier)
+        .login(
+          institutionSlug: _institution.text,
+          identifier: _identifier.text,
+          password: _password.text,
+        );
+  });
 
   Future<void> _register() => _run(() async {
-        final RegistrationResult result =
-            await ref.read(authControllerProvider.notifier).register(
-                  institutionSlug: _institution.text,
-                  institutionUserId: _institutionUserId.text,
-                  displayName: _displayName.text,
-                  email: _email.text,
-                  password: _password.text,
-                );
-        _verificationToken.text = result.developmentVerificationToken ?? '';
-        setState(() {
-          _mode = _AuthMode.verify;
-          _message = 'Registration created. Verify your email to enter administrator review.';
-        });
-      });
+    final RegistrationResult result = await ref
+        .read(authControllerProvider.notifier)
+        .register(
+          institutionSlug: _institution.text,
+          institutionUserId: _institutionUserId.text,
+          displayName: _displayName.text,
+          email: _email.text,
+          password: _password.text,
+        );
+    _verificationToken.text = result.developmentVerificationToken ?? '';
+    setState(() {
+      _mode = _AuthMode.verify;
+      _message = 'Registration created. Verify your email to enter administrator review.';
+    });
+  });
 
   Future<void> _verify() => _run(() async {
-        await ref
-            .read(authControllerProvider.notifier)
-            .verifyEmail(_verificationToken.text);
-        setState(() {
-          _mode = _AuthMode.login;
-          _message = 'Email verified. Your account is waiting for approval.';
-        });
-      });
+    await ref
+        .read(authControllerProvider.notifier)
+        .verifyEmail(_verificationToken.text);
+    setState(() {
+      _mode = _AuthMode.login;
+      _message = 'Email verified. Your account is waiting for approval.';
+    });
+  });
 
   Future<void> _requestReset() => _run(() async {
-        final PasswordResetRequestResult result = await ref
-            .read(authControllerProvider.notifier)
-            .requestPasswordReset(
-              institutionSlug: _institution.text,
-              identifier: _identifier.text,
-            );
-        _resetToken.text = result.developmentResetToken ?? '';
-        setState(() {
-          _mode = _AuthMode.reset;
-          _message = 'If the account exists, reset instructions have been issued.';
-        });
-      });
+    final PasswordResetRequestResult result = await ref
+        .read(authControllerProvider.notifier)
+        .requestPasswordReset(
+          institutionSlug: _institution.text,
+          identifier: _identifier.text,
+        );
+    _resetToken.text = result.developmentResetToken ?? '';
+    setState(() {
+      _mode = _AuthMode.reset;
+      _message = 'If the account exists, reset instructions have been issued.';
+    });
+  });
 
   Future<void> _confirmReset() => _run(() async {
-        await ref.read(authControllerProvider.notifier).confirmPasswordReset(
-              token: _resetToken.text,
-              newPassword: _newPassword.text,
-            );
-        setState(() {
-          _mode = _AuthMode.login;
-          _message = 'Password changed. Existing sessions were revoked.';
-        });
-      });
+    await ref
+        .read(authControllerProvider.notifier)
+        .confirmPasswordReset(
+          token: _resetToken.text,
+          newPassword: _newPassword.text,
+        );
+    setState(() {
+      _mode = _AuthMode.login;
+      _message = 'Password changed. Existing sessions were revoked.';
+    });
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -142,7 +149,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     child: BoardOpsStatusChip(label: 'SECURE ACCESS'),
                   ),
                   const SizedBox(height: 18),
-                  Text('BoardOps', style: Theme.of(context).textTheme.displaySmall),
+                  Text(
+                    'BoardOps',
+                    style: Theme.of(context).textTheme.displaySmall,
+                  ),
                   const SizedBox(height: 8),
                   Text(
                     'Institution-scoped identity with approval, revocable sessions, and secure mobile token storage.',
@@ -154,7 +164,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: <Widget>[
-                        if (_mode == _AuthMode.login || _mode == _AuthMode.register)
+                        if (_mode == _AuthMode.login ||
+                            _mode == _AuthMode.register)
                           SegmentedButton<_AuthMode>(
                             segments: const <ButtonSegment<_AuthMode>>[
                               ButtonSegment<_AuthMode>(
@@ -228,7 +239,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           child: Text(_busy ? 'Signing in…' : 'Sign in'),
         ),
         TextButton(
-          onPressed: _busy ? null : () => setState(() => _mode = _AuthMode.forgot),
+          onPressed: _busy
+              ? null
+              : () => setState(() => _mode = _AuthMode.forgot),
           child: const Text('Forgot password?'),
         ),
       ],
@@ -260,9 +273,14 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         Text('Verify email', style: Theme.of(context).textTheme.headlineSmall),
         _field(_verificationToken, 'Verification token'),
         const SizedBox(height: 18),
-        FilledButton(onPressed: _busy ? null : _verify, child: const Text('Verify email')),
+        FilledButton(
+          onPressed: _busy ? null : _verify,
+          child: const Text('Verify email'),
+        ),
         TextButton(
-          onPressed: _busy ? null : () => setState(() => _mode = _AuthMode.login),
+          onPressed: _busy
+              ? null
+              : () => setState(() => _mode = _AuthMode.login),
           child: const Text('Back to sign in'),
         ),
       ],
@@ -273,7 +291,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Text('Reset password', style: Theme.of(context).textTheme.headlineSmall),
+        Text(
+          'Reset password',
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
         _field(_institution, 'Institution'),
         _field(_identifier, 'Institution User ID or email'),
         const SizedBox(height: 18),
@@ -282,7 +303,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           child: const Text('Send reset instructions'),
         ),
         TextButton(
-          onPressed: _busy ? null : () => setState(() => _mode = _AuthMode.login),
+          onPressed: _busy
+              ? null
+              : () => setState(() => _mode = _AuthMode.login),
           child: const Text('Back to sign in'),
         ),
       ],
@@ -293,7 +316,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Text('Choose a new password', style: Theme.of(context).textTheme.headlineSmall),
+        Text(
+          'Choose a new password',
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
         _field(_resetToken, 'Reset token'),
         _field(_newPassword, 'New password (12+ characters)', password: true),
         const SizedBox(height: 18),
