@@ -7,7 +7,7 @@
     "dev": "wrangler dev --port 8787",
     "build": "vite build",
     "typecheck": "wrangler types --env-interface CloudflareBindings && tsc --noEmit --pretty false",
-    "test": "vitest run"
+    "test": "vitest run --config vitest.config.ts"
   },
   "dependencies": {
     "hono": "4.13.5"
