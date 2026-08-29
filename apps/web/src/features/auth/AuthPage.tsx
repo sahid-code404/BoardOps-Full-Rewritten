@@ -1,4 +1,5 @@
-import { FormEvent, useState } from "react";
+import { useState } from "react";
+import type { FormEvent } from "react";
 import { useNavigate } from "react-router";
 
 import { BoardOpsButton, GlassSurface, StatusChip } from "../../design";
@@ -7,7 +8,9 @@ import { authApi, WebApiError } from "./api";
 type Mode = "login" | "register";
 
 function errorMessage(error: unknown): string {
-  return error instanceof WebApiError ? error.message : "Something went wrong. Please try again.";
+  return error instanceof WebApiError
+    ? error.message
+    : "Something went wrong. Please try again.";
 }
 
 export function AuthPage() {
@@ -31,7 +34,11 @@ export function AuthPage() {
     setBusy(true);
     setMessage(undefined);
     try {
-      await authApi.login({ institutionSlug, identifier, password: loginPassword });
+      await authApi.login({
+        institutionSlug,
+        identifier,
+        password: loginPassword,
+      });
       navigate("/account");
     } catch (error) {
       setMessage(errorMessage(error));
@@ -71,7 +78,9 @@ export function AuthPage() {
     try {
       await authApi.verifyEmail(verificationToken);
       setVerificationToken(undefined);
-      setMessage("Email verified. Your registration is now waiting for administrator review.");
+      setMessage(
+        "Email verified. Your registration is now waiting for administrator review.",
+      );
     } catch (error) {
       setMessage(errorMessage(error));
     } finally {
@@ -107,12 +116,18 @@ export function AuthPage() {
       <section className="auth-layout" aria-labelledby="auth-title">
         <div className="auth-intro">
           <StatusChip>PHASE 04</StatusChip>
-          <h1 id="auth-title">Secure access, without the admin-template feel.</h1>
+          <h1 id="auth-title">
+            Secure access, without the admin-template feel.
+          </h1>
           <p>
-            BoardOps now has institution-scoped identity, verification, review states,
-            secure sessions, permission-aware access, and device revocation foundations.
+            BoardOps now has institution-scoped identity, verification, review
+            states, secure sessions, permission-aware access, and device
+            revocation foundations.
           </p>
-          <div className="auth-principles" aria-label="Authentication principles">
+          <div
+            className="auth-principles"
+            aria-label="Authentication principles"
+          >
             <span>Institution User ID</span>
             <span>HttpOnly web session</span>
             <span>Permission-based authorization</span>
@@ -121,7 +136,11 @@ export function AuthPage() {
         </div>
 
         <GlassSurface className="auth-card" strength="strong">
-          <div className="auth-tabs" role="tablist" aria-label="Authentication mode">
+          <div
+            className="auth-tabs"
+            role="tablist"
+            aria-label="Authentication mode"
+          >
             <BoardOpsButton
               aria-selected={mode === "login"}
               role="tab"
@@ -195,19 +214,38 @@ export function AuthPage() {
               </div>
               <label>
                 Institution
-                <input value={institutionSlug} onChange={(event) => setInstitutionSlug(event.target.value)} required />
+                <input
+                  value={institutionSlug}
+                  onChange={(event) => setInstitutionSlug(event.target.value)}
+                  required
+                />
               </label>
               <label>
                 Institution User ID
-                <input value={institutionUserId} onChange={(event) => setInstitutionUserId(event.target.value)} required />
+                <input
+                  value={institutionUserId}
+                  onChange={(event) => setInstitutionUserId(event.target.value)}
+                  required
+                />
               </label>
               <label>
                 Full name
-                <input autoComplete="name" value={displayName} onChange={(event) => setDisplayName(event.target.value)} required />
+                <input
+                  autoComplete="name"
+                  value={displayName}
+                  onChange={(event) => setDisplayName(event.target.value)}
+                  required
+                />
               </label>
               <label>
                 Email
-                <input autoComplete="email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
+                <input
+                  autoComplete="email"
+                  type="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  required
+                />
               </label>
               <label>
                 Password
@@ -217,7 +255,9 @@ export function AuthPage() {
                   maxLength={128}
                   type="password"
                   value={registrationPassword}
-                  onChange={(event) => setRegistrationPassword(event.target.value)}
+                  onChange={(event) =>
+                    setRegistrationPassword(event.target.value)
+                  }
                   required
                 />
               </label>
@@ -232,7 +272,11 @@ export function AuthPage() {
             </form>
           )}
 
-          {message ? <p className="auth-message" role="status">{message}</p> : null}
+          {message ? (
+            <p className="auth-message" role="status">
+              {message}
+            </p>
+          ) : null}
         </GlassSurface>
       </section>
     </main>
