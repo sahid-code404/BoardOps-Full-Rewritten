@@ -10,6 +10,9 @@ coverage/
 .DS_Store
 *.log
 
+# Cloudflare generated type output
+services/api/worker-configuration.d.ts
+
 # Flutter generated/tool state
 apps/mobile/.dart_tool/
 apps/mobile/.flutter-plugins
