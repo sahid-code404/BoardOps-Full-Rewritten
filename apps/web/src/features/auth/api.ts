@@ -18,13 +18,15 @@ export class WebApiError extends Error {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const headers = new Headers(init?.headers);
+  if (!headers.has("content-type")) {
+    headers.set("content-type", "application/json");
+  }
+
   const response = await fetch(`/api/v1${path}`, {
     ...init,
     credentials: "include",
-    headers: {
-      "content-type": "application/json",
-      ...init?.headers,
-    },
+    headers,
   });
   const payload = (await response.json()) as T & ApiErrorPayload;
   if (!response.ok) {
@@ -66,7 +68,11 @@ export const authApi = {
   }) =>
     request<{ accountState: string }>("/auth/login", {
       method: "POST",
-      body: JSON.stringify({ ...input, clientType: "WEB", deviceName: "Web browser" }),
+      body: JSON.stringify({
+        ...input,
+        clientType: "WEB",
+        deviceName: "Web browser",
+      }),
     }),
 
   register: (input: {
@@ -97,12 +103,17 @@ export const authApi = {
     request<{ sessions: Array<Record<string, unknown>> }>("/auth/sessions"),
 
   revokeSession: (sessionId: string) =>
-    request<{ status: string }>(`/auth/sessions/${encodeURIComponent(sessionId)}`, {
-      method: "DELETE",
-    }),
+    request<{ status: string }>(
+      `/auth/sessions/${encodeURIComponent(sessionId)}`,
+      {
+        method: "DELETE",
+      },
+    ),
 
   registrations: () =>
-    request<{ registrations: Array<Record<string, unknown>> }>("/auth/registrations"),
+    request<{ registrations: Array<Record<string, unknown>> }>(
+      "/auth/registrations",
+    ),
 
   reviewRegistration: (
     userId: string,
