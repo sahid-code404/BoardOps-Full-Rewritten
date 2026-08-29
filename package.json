@@ -1,0 +1,29 @@
+{
+  "name": "boardops",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@11.23.0",
+  "engines": {
+    "node": ">=24.20.0"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --stream --filter @boardops/web --filter @boardops/api dev",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --if-present test",
+    "build": "pnpm -r --if-present build",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "24.13.3",
+    "eslint": "10.9.1",
+    "globals": "17.11.0",
+    "prettier": "3.9.6",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.68.0",
+    "vitest": "4.1.11"
+  }
+}

@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [main, 'phase/**']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  web-api:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24.20.0'
+          package-manager-cache: false
+      - name: Enable pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@11.23.0 --activate
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Format
+        run: pnpm format:check
+      - name: Lint
+        run: pnpm lint
+      - name: TypeScript
+        run: pnpm typecheck
+      - name: Unit tests
+        run: pnpm test
+      - name: Builds
+        run: pnpm build
+
+  flutter-android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.1'
+          channel: stable
+          cache: true
+      - name: Resolve locked packages
+        working-directory: apps/mobile
+        run: flutter pub get
+      - name: Analyze
+        working-directory: apps/mobile
+        run: flutter analyze
+      - name: Unit/widget tests
+        working-directory: apps/mobile
+        run: flutter test
+      - name: Materialize standard Android platform scaffold
+        working-directory: apps/mobile
+        run: flutter create --platforms=android --project-name boardops --org com.sahidcode404 .
+      - name: Android debug build
+        working-directory: apps/mobile
+        run: flutter build apk --debug
+
+  flutter-ios:
+    runs-on: macos-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v5
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.1'
+          channel: stable
+          cache: true
+      - name: Resolve locked packages
+        working-directory: apps/mobile
+        run: flutter pub get
+      - name: Materialize standard iOS platform scaffold
+        working-directory: apps/mobile
+        run: flutter create --platforms=ios --project-name boardops --org com.sahidcode404 .
+      - name: iOS compile validation
+        working-directory: apps/mobile
+        run: flutter build ios --debug --no-codesign

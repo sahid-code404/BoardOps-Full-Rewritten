@@ -13,18 +13,23 @@ There is no one-to-one Next API migration. The target exposes a coherent `/api/v
 ## Target resource/use-case families
 
 ### Auth / identity
+
 `auth/register`, verification/resend/status, login/2fa, refresh-or-session continuation as chosen by session design, logout, password reset/change, sessions list/revoke, `me`, profile.
 
 ### Residents / permissions
+
 Resident search/detail/review/approve/reject/request-changes/suspend/archive/restore; roles/permissions and assignment endpoints. All lists are institution-scoped and permission filtered.
 
 ### Meals
+
 Meal definitions, service rules, schedule/query, resident booking mutation, guest meals, holiday rules, counts/operations, admin override with mandatory reason.
 
 ### Finance
+
 Purchases, expenses, resident fund summary/ledger, bills, payments/deposits, payment review, refunds, adjustments, restrictions/exemptions, monthly cycles/readiness/close/status/reconcile, variables/formulas/policies/reference numbering.
 
 ### Communication / operations
+
 Notifications, announcements, audit search, activity timeline, reports/exports, file upload metadata, settings/configuration, health/version/runtime metadata.
 
 ## Contract requirements

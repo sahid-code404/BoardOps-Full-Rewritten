@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "boardops-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-29",
+  "observability": { "enabled": true },
+  "vars": { "BOARDOPS_ENV": "development" },
+  "env": {
+    "staging": {
+      "name": "boardops-api-staging",
+      "vars": { "BOARDOPS_ENV": "staging" },
+    },
+    "production": {
+      "name": "boardops-api-production",
+      "vars": { "BOARDOPS_ENV": "production" },
+    },
+  },
+}

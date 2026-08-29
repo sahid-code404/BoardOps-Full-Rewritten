@@ -1,0 +1,10 @@
+packages:
+  - apps/web
+  - services/api
+  - packages/*
+
+# pnpm 11 blocks dependency build scripts unless they are reviewed explicitly.
+# Vite/Cloudflare require these two native/runtime build steps.
+allowBuilds:
+  esbuild: true
+  workerd: true

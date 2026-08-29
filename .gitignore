@@ -1,0 +1,29 @@
+node_modules/
+dist/
+coverage/
+.vite/
+.wrangler/
+.dev.vars
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log
+
+# Cloudflare generated type output
+services/api/worker-configuration.d.ts
+
+# Flutter generated/tool state
+apps/mobile/.dart_tool/
+apps/mobile/.flutter-plugins
+apps/mobile/.flutter-plugins-dependencies
+apps/mobile/.pub-cache/
+apps/mobile/build/
+apps/mobile/.idea/
+apps/mobile/.metadata
+
+# Phase 01 keeps platform folders as generated build scaffolds. Only the
+# tracked .gitkeep placeholders belong in source control until mobile platform
+# integration is intentionally introduced in a later phase.
+apps/mobile/android/*
+apps/mobile/ios/*

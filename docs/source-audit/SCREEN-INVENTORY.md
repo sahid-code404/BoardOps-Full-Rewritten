@@ -27,12 +27,15 @@ The source component families additionally contain auth, audit, billing, calenda
 ## Required target web/mobile surfaces
 
 ### Visitor / authentication
+
 Registration; email/OTP verification/status; pending/rejected/changes-requested states; login + 2FA challenge; forgot/reset password; session-expired/error states.
 
 ### Resident
+
 Dashboard (Today’s Meals + next 7 days + fund/bill summary), Meals calendar/agenda/day views, bill list/detail, payment/deposit submit + proof/reference + status, fund breakdown/ledger, notifications, profile/personal info, password, sessions, 2FA, preferences.
 
 ### Authorized administration
+
 Dashboard/alerts; Resident Management review/profile/lifecycle; Meal Configuration; Meal Operations/counts/overrides; Billing/preview/generation/history/details; Payments review/detail; Expenses/Purchases; Funds/ledger/restrictions; Variables; Formula Builder; Policies; Monthly Closing; Reports; Notifications/announcements; Settings; Audit; Activity Timeline; System/operations where permitted.
 
 ## Shared screen-state requirements
