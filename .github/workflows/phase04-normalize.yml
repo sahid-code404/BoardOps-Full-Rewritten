@@ -7,7 +7,7 @@ on:
       - '.github/workflows/phase04-normalize.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   normalize:
@@ -39,21 +39,27 @@ jobs:
           dart format lib/features/auth lib/routing/app_router.dart test/app_test.dart
           flutter analyze
           flutter test
-      - uses: actions/upload-artifact@v4
-        with:
-          name: phase04-normalized-sources
-          path: |
-            services/api/src/auth
-            services/api/src/dev
-            apps/web/src/features/auth
-            apps/web/src/styles/auth.css
-            scripts/auth-smoke.mjs
-            packages/api-contract/openapi/boardops-v1.yaml
-            docs/api/CONTRACT.md
-            package.json
-            services/api/package.json
-            apps/mobile/lib/features/auth
-            apps/mobile/lib/routing/app_router.dart
-            apps/mobile/test/app_test.dart
+      - name: Commit normalized Phase 04 sources
+        run: |
+          git config user.name "BoardOps CI"
+          git config user.email "actions@users.noreply.github.com"
+          git add \
+            services/api/src/auth \
+            services/api/src/dev \
+            apps/web/src/features/auth \
+            apps/web/src/styles/auth.css \
+            scripts/auth-smoke.mjs \
+            packages/api-contract/openapi/boardops-v1.yaml \
+            docs/api/CONTRACT.md \
+            package.json \
+            services/api/package.json \
+            apps/mobile/lib/features/auth \
+            apps/mobile/lib/routing/app_router.dart \
+            apps/mobile/test/app_test.dart \
             apps/mobile/pubspec.lock
-          if-no-files-found: error
+          if git diff --cached --quiet; then
+            echo "No normalization changes required."
+          else
+            git commit -m "style: normalize Phase 04 authentication sources"
+            git push origin HEAD:phase/04-authentication-foundation
+          fi
