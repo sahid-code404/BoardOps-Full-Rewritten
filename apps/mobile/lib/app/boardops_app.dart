@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../design/boardops_theme.dart';
 import '../routing/app_router.dart';
 
 class BoardOpsApp extends StatelessWidget {
@@ -10,8 +11,8 @@ class BoardOpsApp extends StatelessWidget {
     return MaterialApp.router(
       title: 'BoardOps',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(useMaterial3: true, brightness: Brightness.light),
-      darkTheme: ThemeData(useMaterial3: true, brightness: Brightness.dark),
+      theme: buildBoardOpsTheme(Brightness.light),
+      darkTheme: buildBoardOpsTheme(Brightness.dark),
       themeMode: ThemeMode.system,
       routerConfig: appRouter,
     );
