@@ -73,7 +73,7 @@ export function PermissionsPage() {
     return (
       <main className="auth-page permissions-page">
         <GlassSurface className="account-loading">
-          Loading authorization policy…
+          Loading access control…
         </GlassSurface>
       </main>
     );
@@ -84,17 +84,17 @@ export function PermissionsPage() {
 
   return (
     <main className="auth-page permissions-page">
-      <div className="ambient ambient--one" aria-hidden="true" />
-      <div className="ambient ambient--two" aria-hidden="true" />
+      <div className="auth-mesh auth-mesh--one" aria-hidden="true" />
+      <div className="auth-mesh auth-mesh--two" aria-hidden="true" />
+      <div className="auth-mesh auth-mesh--three" aria-hidden="true" />
       <section className="permissions-shell">
         <header className="permission-page-header">
           <div>
-            <span className="section-label">Phase 05 · Permission engine</span>
-            <h1>Access control</h1>
+            <span className="section-label">Admin Console</span>
+            <h1>Access Control</h1>
             <p>
-              Roles provide reusable access. Direct overrides are explicit
-              exceptions. The backend re-evaluates effective permissions on every
-              authenticated request and DENY always wins.
+              Manage institution roles, permissions, and individual access from
+              one workspace.
             </p>
           </div>
           <div className="account-header__actions">
@@ -108,20 +108,18 @@ export function PermissionsPage() {
         {!canRead ? (
           <GlassSurface className="permission-denied" strength="strong">
             <StatusChip tone="danger">Access denied</StatusChip>
-            <h2>permissions.read is required</h2>
+            <h2>Access control is unavailable</h2>
             <p>
-              The page is hidden or blocked when authorization is missing. This is
-              only a client convenience—the API independently enforces every
-              action.
+              Your account does not have permission to view this workspace.
             </p>
           </GlassSurface>
         ) : (
           <>
             <div className="permission-kpis">
               <GlassSurface className="permission-kpi" strength="soft">
-                <span>Catalog</span>
+                <span>Permissions</span>
                 <strong>{catalog.length}</strong>
-                <small>canonical permissions</small>
+                <small>available actions</small>
               </GlassSurface>
               <GlassSurface className="permission-kpi" strength="soft">
                 <span>Roles</span>
