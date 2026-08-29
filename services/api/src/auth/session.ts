@@ -3,6 +3,7 @@ import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 
 import type { AppEnv } from "../app-env";
 import { ApiError } from "../http/api-error";
+import { effectivePermissionsForUser } from "../permissions/access";
 import { randomToken, sha256Text } from "./crypto";
 import type { AccountState, AuthPrincipal, ClientType } from "./types";
 
@@ -32,43 +33,6 @@ function bearerToken(c: Context<AppEnv>): string | undefined {
 
 export function requestSessionToken(c: Context<AppEnv>): string | undefined {
   return bearerToken(c) ?? getCookie(c, SESSION_COOKIE);
-}
-
-async function permissionsForUser(
-  db: D1Database,
-  userId: string,
-): Promise<string[]> {
-  const allowed = await db
-    .prepare(
-      `SELECT DISTINCT permission_code AS code
-       FROM (
-         SELECT rp.permission_code
-         FROM user_roles ur
-         JOIN role_permissions rp ON rp.role_id = ur.role_id
-         WHERE ur.user_id = ?
-         UNION ALL
-         SELECT permission_code
-         FROM user_permission_grants
-         WHERE user_id = ? AND effect = 'ALLOW'
-       )`,
-    )
-    .bind(userId, userId)
-    .all<{ code: string }>();
-
-  const denied = await db
-    .prepare(
-      `SELECT permission_code AS code
-       FROM user_permission_grants
-       WHERE user_id = ? AND effect = 'DENY'`,
-    )
-    .bind(userId)
-    .all<{ code: string }>();
-
-  const deniedCodes = new Set(denied.results.map((row) => row.code));
-  return allowed.results
-    .map((row) => row.code)
-    .filter((code) => !deniedCodes.has(code))
-    .sort();
 }
 
 export async function resolvePrincipal(
@@ -118,7 +82,7 @@ export async function resolvePrincipal(
     accountState: row.account_state,
     clientType: row.client_type,
     stepUpVerifiedAtMs: row.step_up_verified_at_ms,
-    permissions: await permissionsForUser(c.env.DB, row.user_id),
+    permissions: await effectivePermissionsForUser(c.env.DB, row.user_id),
   };
 }
 
@@ -130,29 +94,6 @@ export const requireAuth: MiddlewareHandler<AppEnv> = async (c, next) => {
   c.set("auth", principal);
   await next();
 };
-
-export function requirePermission(
-  permission: string,
-): MiddlewareHandler<AppEnv> {
-  return async (c, next) => {
-    const principal = c.get("auth") ?? (await resolvePrincipal(c));
-    if (!principal) {
-      throw new ApiError(401, "AUTH_REQUIRED", "Authentication is required.");
-    }
-    if (principal.accountState !== "ACTIVE") {
-      throw new ApiError(
-        403,
-        "ACCOUNT_NOT_ACTIVE",
-        "The account is not active for this operation.",
-      );
-    }
-    if (!principal.permissions.includes(permission)) {
-      throw new ApiError(403, "PERMISSION_DENIED", "Permission denied.");
-    }
-    c.set("auth", principal);
-    await next();
-  };
-}
 
 export async function createSession(
   c: Context<AppEnv>,
