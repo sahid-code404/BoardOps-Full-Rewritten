@@ -2,6 +2,8 @@ import { Hono } from "hono";
 import { requestId } from "hono/request-id";
 
 import type { AppEnv } from "./app-env";
+import { authRoutes } from "./auth/routes";
+import { devRoutes } from "./dev/routes";
 import { apiErrorResponse } from "./http/error-response";
 import { readinessSnapshot } from "./infrastructure/database-readiness";
 import { requestLogging } from "./observability/request-logging";
@@ -41,6 +43,9 @@ app.get("/api/v1/meta", (c) =>
     requestId: c.get("requestId"),
   }),
 );
+
+app.route("/api/v1/auth", authRoutes);
+app.route("/api/v1/dev", devRoutes);
 
 app.notFound((c) =>
   c.json(
