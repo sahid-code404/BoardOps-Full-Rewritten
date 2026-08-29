@@ -1,18 +1,20 @@
 # Dependency / Version Matrix — Phase 01 Verified Baseline
 
-Verified against official/project package sources and Phase 01 CI on **2026-08-29**. Exact versions present in the Phase 01 manifests/lockfiles are pinned and verified. Rows for later-phase capabilities remain approved target versions only and must be reverified when those packages are actually introduced.
+Verified against official/project package sources and Phase 01 CI on **2026-08-29**. Exact versions currently present in Phase 01 manifests/lockfiles are pinned and verified. Later-phase package rows remain approved target versions and must be reverified when they are introduced.
 
 ## Toolchain
 
-| Name               | Exact version | Purpose                      | Why needed                                                          | Alternatives rejected                              | Runtime impact  | Maintenance risk       |
-| ------------------ | ------------: | ---------------------------- | ------------------------------------------------------------------- | -------------------------------------------------- | --------------- | ---------------------- |
-| Node.js            |   24.20.0 LTS | JS tooling/CI                | Stable LTS for Vite/pnpm tooling                                    | Node 26 Current: avoid current-line churn          | Build-time only | Low                    |
-| pnpm               |       11.23.0 | JS workspace/package manager | Strict, efficient monorepo installs                                 | npm/yarn: no product benefit here                  | Build-time only | Low                    |
-| TypeScript         |         6.0.3 | Web/API type checking        | Newest stable mutually compatible pin verified with current tooling | TypeScript 7: unsupported by selected lint tooling | Build-time only | Medium: compatibility  |
-| Prettier           |         3.9.6 | Deterministic formatting     | Reduces formatting churn                                            | Hand formatting                                    | Build-time only | Low                    |
-| Vitest             |        4.1.11 | TS unit/domain tests         | Vite-native fast tests                                              | Jest: extra stack                                  | Dev/CI only     | Low                    |
-| @playwright/test   |        1.62.1 | Cross-browser critical E2E   | Required production flow validation                                 | Cypress: redundant second E2E stack                | Dev/CI; browsers large | Medium            |
-| openapi-typescript |        7.13.0 | OpenAPI → TS types           | Runtime-free generated contract types                               | Hand-maintained types                              | Build-time only | Low                    |
+| Name               | Exact version | Purpose                      | Why needed                            | Alternatives rejected                     | Runtime impact         | Maintenance risk     |
+| ------------------ | ------------: | ---------------------------- | ------------------------------------- | ----------------------------------------- | ---------------------- | -------------------- |
+| Node.js            |   24.20.0 LTS | JS tooling/CI                | Stable LTS for Vite/pnpm tooling      | Node 26 Current: avoid current-line churn | Build-time only        | Low                  |
+| pnpm               |       11.23.0 | JS workspace/package manager | Strict, efficient monorepo installs   | npm/yarn: no product benefit here         | Build-time only        | Low                  |
+| TypeScript         |         6.0.3 | Web/API type checking        | Current stable baseline               | JS-only: weaker contracts                 | Build-time only        | Medium: recent major |
+| Prettier           |         3.9.6 | Deterministic formatting     | Reduces formatting churn              | Hand formatting                           | Build-time only        | Low                  |
+| Vitest             |        4.1.11 | TS unit/domain tests         | Vite-native fast tests                | Jest: extra stack                         | Dev/CI only            | Low                  |
+| @playwright/test   |        1.62.1 | Cross-browser critical E2E   | Required production flow validation   | Cypress: redundant second E2E stack       | Dev/CI; browsers large | Medium               |
+| openapi-typescript |        7.13.0 | OpenAPI → TS types           | Runtime-free generated contract types | Hand-maintained types                     | Build-time only        | Low                  |
+
+TypeScript is deliberately pinned to **6.0.3** because the selected `typescript-eslint` release does not officially support TypeScript 7. The compatibility downgrade is recorded in ADR-014.
 
 ## Web (`apps/web`)
 
@@ -73,7 +75,7 @@ No ORM is approved in Phase 01. D1 schema/migration/query strategy must be chose
 
 ## OTA
 
-Shorebird remains the accepted OTA mechanism. `shorebird_code_push` **2.0.7** is optional and should be added only if BoardOps needs an in-app check/download/status UI; automatic Shorebird update behavior does not require adding it solely to enable patches. Shorebird CLI itself is an external release tool, not a pub dependency. CI must record the installed stable CLI version and verify the selected Flutter SDK is supported before each release.
+Shorebird remains the accepted OTA mechanism. `shorebird_code_push` **2.0.7** is optional and should be added only if BoardOps needs an in-app check/download/status UI; automatic Shorebird update behavior does not require adding it solely to enable patches. Shorebird CLI itself is an external release tool, not a pub dependency. CI must record the installed stable CLI version and verify the selected Flutter SDK is supported before each release. Shorebird documentation currently lists Android/iOS support from Flutter 3.24+ and recommends latest stable Flutter.
 
 ## Explicitly rejected legacy dependencies/approaches
 
@@ -87,11 +89,11 @@ Shorebird remains the accepted OTA mechanism. `shorebird_code_push` **2.0.7** is
 
 ## Phase 01 compatibility gate results
 
-1. React/Vite with TypeScript 6.0.3: **PASS** in CI.
-2. Hono/Workers build with the Cloudflare Vite plugin: **PASS** in CI.
-3. Wrangler binding generation using `wrangler types`: **PASS** in CI.
-4. Minimal Flutter 3.47.1 app with go_router/Riverpod: **PASS** analyze, tests, Android build and iOS no-codesign compile in CI.
-5. Shorebird compatibility remains a release/OTA-phase gate because OTA is not implemented in Phase 01.
-6. TypeScript 7 was not used because the selected `typescript-eslint` release does not officially support it; the compatible TypeScript 6.0.3 pin is documented in ADR-014.
+1. React/Vite with the TypeScript 6.0.3 compatibility pin: **PASS** in CI.
+2. Hono/Workers integration with the Cloudflare Vite plugin: **PASS** in CI.
+3. Wrangler Worker binding type generation: **PASS** in CI.
+4. Minimal Flutter 3.47.1 foundation with go_router/Riverpod: **PASS** analyze, tests, Android debug build and iOS no-codesign compile in CI.
+5. Shorebird remains a release/OTA-phase compatibility gate because OTA is not implemented in Phase 01.
+6. The TypeScript 7 incompatibility was resolved by pinning the newest mutually compatible stable TypeScript version and recording it in ADR-014.
 
-Final verification: GitHub Actions run `33261749202` completed successfully for all Phase 01 jobs.
+Final Phase 01 verification run: `33261749202`.
