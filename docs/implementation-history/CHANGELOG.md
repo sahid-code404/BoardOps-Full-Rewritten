@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Phase 05 — Permissions
+
+- Added `permissions.read` and `permissions.manage` to the canonical permission catalog plus D1 indexes for role lookup, role-permission lookup, user-role membership, and direct permission overrides.
+- Centralized effective-permission resolution so role inheritance and direct overrides share one authoritative backend implementation; explicit `DENY` wins over inherited or direct `ALLOW`.
+- Added reusable exact/all/any backend permission guards and a permission + recent STEP_UP guard for high-risk access mutations.
+- Refactored registration review to use the centralized permission guard instead of the Phase 04 transitional helper.
+- Added institution-scoped permission catalog, role management, user access, role-membership, and direct-override API routes.
+- Added immutable system-role handling, cross-institution role rejection, canonical permission validation, mandatory reasons, audited access mutations, and self-lockout prevention.
+- Added a responsive Web Access control workspace with role editing, user role assignment, direct ALLOW/DENY/INHERIT overrides, and step-up verification.
+- Added Flutter canonical permission constants, exact/all/any policy helpers, fail-closed ACTIVE-account checks, a reusable visibility gate, and a route redirect helper.
+- Expanded the OpenAPI v1 contract for all Phase 05 permission endpoints and documented ADR-016 plus the authorization architecture.
+- Added unit and end-to-end permission tests covering inherited access, denied actions, direct DENY precedence, direct ALLOW, STEP_UP enforcement, and self-lockout protection.
+- Kept destructive role deletion, break-glass recovery, final app-shell navigation, and later business-action wiring explicitly deferred to their roadmap phases.
+
 ### Phase 04 — Authentication foundation
 
 - Added D1 authentication migrations for users, account-state history, password credentials, sessions, verification/reset credentials, OTP challenges, login-attempt throttling, and role/permission foundations.
