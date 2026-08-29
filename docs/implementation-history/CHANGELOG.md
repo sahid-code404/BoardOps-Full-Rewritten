@@ -4,17 +4,17 @@
 
 ### Phase 05 — Permissions
 
-- Added `permissions.read` and `permissions.manage` to the canonical permission catalog plus D1 indexes for role lookup, role-permission lookup, user-role membership, and direct permission overrides.
-- Centralized effective-permission resolution so role inheritance and direct overrides share one authoritative backend implementation; explicit `DENY` wins over inherited or direct `ALLOW`.
-- Added reusable exact/all/any backend permission guards and a permission + recent STEP_UP guard for high-risk access mutations.
-- Refactored registration review to use the centralized permission guard instead of the Phase 04 transitional helper.
-- Added institution-scoped permission catalog, role management, user access, role-membership, and direct-override API routes.
-- Added immutable system-role handling, cross-institution role rejection, canonical permission validation, mandatory reasons, audited access mutations, and self-lockout prevention.
-- Added a responsive Web Access control workspace with role editing, user role assignment, direct ALLOW/DENY/INHERIT overrides, and step-up verification.
-- Added Flutter canonical permission constants, exact/all/any policy helpers, fail-closed ACTIVE-account checks, a reusable visibility gate, and a route redirect helper.
-- Expanded the OpenAPI v1 contract for all Phase 05 permission endpoints and documented ADR-016 plus the authorization architecture.
-- Added unit and end-to-end permission tests covering inherited access, denied actions, direct DENY precedence, direct ALLOW, STEP_UP enforcement, and self-lockout protection.
-- Kept destructive role deletion, break-glass recovery, final app-shell navigation, and later business-action wiring explicitly deferred to their roadmap phases.
+- Added a canonical institution-scoped permission engine with reusable exact/all/any backend guards.
+- Added effective permission resolution from role inheritance plus direct user overrides with deterministic direct `DENY` precedence.
+- Added D1 permission-engine migration/indexes and canonical `permissions.read` / `permissions.manage` permissions.
+- Added institution-scoped custom-role and user-access administration with cross-institution protection.
+- Added recent STEP_UP enforcement for high-risk permission mutations, mandatory mutation reasons, append-only audit evidence, and self-lockout protection.
+- Added a Web Access Control workspace for role editing, user-role assignment, direct ALLOW/DENY/INHERIT overrides, effective-access visibility, and step-up verification.
+- Added Flutter permission constants, exact/all/any policies, `PermissionGate`, route-redirect behavior, and deterministic tests.
+- Expanded the OpenAPI v1 contract for permission catalog, role, and user-access administration.
+- Added combined authentication + permission E2E smoke coverage for role inheritance, denied actions, direct overrides, step-up protection, auditing, and self-lockout prevention.
+- Corrected a human-review visual-parity defect: the rewrite auth surface had drifted into an oversized marketing split-screen even though the audited reference uses a centered compact strong-glass auth card. The centered BoardOps/Operations Suite card, segmented auth navigation, dense rounded inputs/actions, mesh ambience, and compact authenticated surface rhythm are restored without changing the Phase 04/05 security model.
+- Kept the complete authenticated navigation shell deferred to Phase 06 so menu/search/theme/notification/profile controls are implemented as real functionality rather than visual placeholders.
 
 ### Phase 04 — Authentication foundation
 
