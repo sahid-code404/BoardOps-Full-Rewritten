@@ -42,7 +42,7 @@ void main() {
   });
 
   test('fails closed for inactive and signed-out users', () {
-    final AuthUser inactive = AuthUser(
+    const AuthUser inactive = AuthUser(
       id: 'user-2',
       institutionId: 'institution-1',
       institutionSlug: 'demo',
@@ -50,7 +50,7 @@ void main() {
       email: 'inactive@boardops.local',
       displayName: 'Inactive User',
       accountState: 'SUSPENDED',
-      permissions: const <String>[BoardOpsPermission.permissionsRead],
+      permissions: <String>[BoardOpsPermission.permissionsRead],
     );
     expect(hasPermission(inactive, BoardOpsPermission.permissionsRead), isFalse);
     expect(hasPermission(null, BoardOpsPermission.permissionsRead), isFalse);
