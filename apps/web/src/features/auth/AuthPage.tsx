@@ -95,7 +95,7 @@ export function AuthPage() {
       <div className="auth-mesh auth-mesh--two" aria-hidden="true" />
       <div className="auth-mesh auth-mesh--three" aria-hidden="true" />
 
-      <section className="auth-layout" aria-labelledby="auth-title">
+      <section className="auth-layout" aria-label="BoardOps authentication">
         <GlassSurface className="auth-card" strength="strong">
           <div className="auth-brand">
             <div className="auth-brand__mark" aria-hidden="true">
@@ -134,10 +134,6 @@ export function AuthPage() {
 
           {mode === "login" ? (
             <form className="auth-form" onSubmit={signIn}>
-              <div className="auth-form__heading">
-                <h1 id="auth-title">Welcome back</h1>
-                <p>Sign in to your institution workspace.</p>
-              </div>
               <label>
                 Institution
                 <input
@@ -182,10 +178,6 @@ export function AuthPage() {
             </form>
           ) : mode === "register" ? (
             <form className="auth-form" onSubmit={register}>
-              <div className="auth-form__heading">
-                <h1 id="auth-title">Create account</h1>
-                <p>Register with the identity issued by your institution.</p>
-              </div>
               <label>
                 Institution
                 <input
