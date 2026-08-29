@@ -1,0 +1,16 @@
+.auth-card .bo-button {
+  border-radius: 16px;
+}
+
+.auth-tabs {
+  border-radius: 16px;
+}
+
+.auth-tabs .bo-button {
+  border-radius: 12px;
+}
+
+.account-page .bo-button,
+.permissions-page .bo-button {
+  border-radius: 14px;
+}
