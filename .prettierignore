@@ -1,5 +1,8 @@
 pnpm-lock.yaml
 apps/mobile/pubspec.lock
+.github/workflows/ci.yml
 apps/mobile/lib/design/design_tokens.dart
 packages/design-tokens/web/tokens.css
 scripts/generate-design-tokens.mjs
+apps/web/src/features/foundation/FoundationPage.tsx
+apps/web/src/styles/base.css
