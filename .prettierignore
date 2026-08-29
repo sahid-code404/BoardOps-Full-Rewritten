@@ -7,6 +7,7 @@ packages/api-contract/openapi/boardops-v1.yaml
 scripts/generate-design-tokens.mjs
 apps/web/src/features/foundation/FoundationPage.tsx
 apps/web/src/styles/base.css
+apps/web/src/styles/auth.css
 apps/web/src/features/permissions/**
 apps/web/src/styles/permissions.css
 scripts/permissions-smoke.mjs
