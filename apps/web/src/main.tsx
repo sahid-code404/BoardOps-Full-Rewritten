@@ -6,6 +6,7 @@ import { App } from "./app/App";
 import "./styles/base.css";
 import "./styles/auth.css";
 import "./styles/permissions.css";
+import "./styles/reference-parity.css";
 
 const root = document.getElementById("root");
 if (!root) throw new Error("BoardOps root element is missing");
