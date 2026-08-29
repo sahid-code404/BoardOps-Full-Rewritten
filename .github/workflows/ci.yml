@@ -14,15 +14,15 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: '24.20.0'
       - name: Enable pnpm
         run: |
           corepack enable
           corepack prepare pnpm@11.23.0 --activate
-      - name: Install
-        run: pnpm install --no-frozen-lockfile
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
       - name: Format
         run: pnpm format:check
       - name: Lint
@@ -33,12 +33,6 @@ jobs:
         run: pnpm test
       - name: Builds
         run: pnpm build
-      - name: Print generated pnpm lockfile for bootstrap capture
-        if: always()
-        run: |
-          echo '===BOARDOPS_PNPM_LOCK_BEGIN==='
-          cat pnpm-lock.yaml || true
-          echo '===BOARDOPS_PNPM_LOCK_END==='
 
   flutter-android:
     runs-on: ubuntu-latest
@@ -50,7 +44,7 @@ jobs:
           flutter-version: '3.47.1'
           channel: stable
           cache: true
-      - name: Resolve packages
+      - name: Resolve locked packages
         working-directory: apps/mobile
         run: flutter pub get
       - name: Analyze
@@ -65,13 +59,6 @@ jobs:
       - name: Android debug build
         working-directory: apps/mobile
         run: flutter build apk --debug
-      - name: Print generated pub lockfile for bootstrap capture
-        if: always()
-        working-directory: apps/mobile
-        run: |
-          echo '===BOARDOPS_PUB_LOCK_BEGIN==='
-          cat pubspec.lock || true
-          echo '===BOARDOPS_PUB_LOCK_END==='
 
   flutter-ios:
     runs-on: macos-latest
@@ -83,7 +70,7 @@ jobs:
           flutter-version: '3.47.1'
           channel: stable
           cache: true
-      - name: Resolve packages
+      - name: Resolve locked packages
         working-directory: apps/mobile
         run: flutter pub get
       - name: Materialize standard iOS platform scaffold
