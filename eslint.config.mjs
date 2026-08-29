@@ -1,18 +1,25 @@
-import js from '@eslint/js';
-import globals from 'globals';
-import tseslint from 'typescript-eslint';
+import js from "@eslint/js";
+import globals from "globals";
+import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ['**/dist/**', '**/coverage/**', '**/.wrangler/**', '**/node_modules/**'] },
+  {
+    ignores: [
+      "**/dist/**",
+      "**/coverage/**",
+      "**/.wrangler/**",
+      "**/node_modules/**",
+    ],
+  },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    files: ['**/*.{ts,tsx}'],
+    files: ["**/*.{ts,tsx}"],
     languageOptions: {
       globals: { ...globals.browser, ...globals.worker, ...globals.node },
     },
     rules: {
-      '@typescript-eslint/consistent-type-imports': 'error'
-    }
-  }
+      "@typescript-eslint/consistent-type-imports": "error",
+    },
+  },
 );

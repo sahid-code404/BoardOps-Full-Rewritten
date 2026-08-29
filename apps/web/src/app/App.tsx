@@ -1,5 +1,5 @@
-import { Navigate, Route, Routes } from 'react-router';
-import { FoundationPage } from '../features/foundation/FoundationPage';
+import { Navigate, Route, Routes } from "react-router";
+import { FoundationPage } from "../features/foundation/FoundationPage";
 
 export function App() {
   return (

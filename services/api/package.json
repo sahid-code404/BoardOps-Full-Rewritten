@@ -9,7 +9,9 @@
     "typecheck": "wrangler types --env-interface CloudflareBindings && tsc --noEmit --pretty false",
     "test": "vitest run"
   },
-  "dependencies": { "hono": "4.13.5" },
+  "dependencies": {
+    "hono": "4.13.5"
+  },
   "devDependencies": {
     "@cloudflare/vite-plugin": "1.54.1",
     "vite": "8.2.2",

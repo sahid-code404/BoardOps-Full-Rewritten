@@ -9,12 +9,12 @@ paths:
     get:
       operationId: getHealth
       responses:
-        '200':
+        "200":
           description: API health
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/HealthResponse'
+                $ref: "#/components/schemas/HealthResponse"
 components:
   schemas:
     HealthResponse:
