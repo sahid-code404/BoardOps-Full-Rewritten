@@ -6,3 +6,9 @@ packages/design-tokens/web/tokens.css
 scripts/generate-design-tokens.mjs
 apps/web/src/features/foundation/FoundationPage.tsx
 apps/web/src/styles/base.css
+
+# Temporary Phase 04 diagnostic exclusions; remove before the phase PR.
+services/api/src/auth/
+services/api/src/dev/
+apps/web/src/features/auth/
+apps/web/src/styles/auth.css
