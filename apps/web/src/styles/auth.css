@@ -1,0 +1,280 @@
+.auth-page {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  isolation: isolate;
+  padding:
+    max(var(--bo-space-xl), env(safe-area-inset-top))
+    max(var(--bo-space-xl), env(safe-area-inset-right))
+    max(var(--bo-space-xl), env(safe-area-inset-bottom))
+    max(var(--bo-space-xl), env(safe-area-inset-left));
+  background:
+    radial-gradient(circle at 12% 12%, color-mix(in srgb, var(--bo-color-primary) 22%, transparent), transparent 34%),
+    radial-gradient(circle at 88% 82%, color-mix(in srgb, var(--bo-color-accent) 15%, transparent), transparent 38%),
+    var(--bo-color-background);
+}
+
+.auth-layout,
+.account-shell {
+  width: min(1180px, 100%);
+  min-height: calc(100vh - 2 * var(--bo-space-xl));
+  margin: 0 auto;
+}
+
+.auth-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.75fr);
+  align-items: center;
+  gap: clamp(36px, 7vw, 96px);
+}
+
+.auth-intro {
+  max-width: 700px;
+}
+
+.auth-intro h1,
+.account-header h1 {
+  margin: var(--bo-space-lg) 0;
+  font-size: clamp(42px, 6vw, 72px);
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+}
+
+.auth-intro > p,
+.account-header p,
+.empty-copy {
+  color: var(--bo-color-foreground-muted);
+  line-height: 1.65;
+}
+
+.auth-principles,
+.permission-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--bo-space-sm);
+  margin-top: var(--bo-space-xl);
+}
+
+.auth-principles span,
+.permission-cloud span {
+  padding: 8px 12px;
+  border: 1px solid var(--bo-color-border);
+  border-radius: var(--bo-radius-pill);
+  background: color-mix(in srgb, var(--bo-color-surface) 58%, transparent);
+  color: var(--bo-color-foreground-muted);
+  font-size: var(--bo-type-caption);
+}
+
+.auth-card,
+.account-loading {
+  border-radius: var(--bo-radius-xxl);
+  padding: clamp(22px, 4vw, 34px);
+}
+
+.auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--bo-space-sm);
+  margin-bottom: var(--bo-space-xl);
+  padding: var(--bo-space-xs);
+  border-radius: var(--bo-radius-pill);
+  background: color-mix(in srgb, var(--bo-color-surface-muted) 70%, transparent);
+}
+
+.auth-tabs .bo-button {
+  width: 100%;
+  box-shadow: none;
+}
+
+.auth-form {
+  display: grid;
+  gap: var(--bo-space-lg);
+}
+
+.auth-form__heading h2 {
+  margin-bottom: 0;
+}
+
+.auth-form label {
+  display: grid;
+  gap: var(--bo-space-sm);
+  color: var(--bo-color-foreground-muted);
+  font-size: var(--bo-type-label);
+  font-weight: 650;
+}
+
+.auth-form input {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid var(--bo-color-border);
+  border-radius: var(--bo-radius-lg);
+  padding: 0 14px;
+  color: var(--bo-color-foreground);
+  background: color-mix(in srgb, var(--bo-color-surface) 76%, transparent);
+  outline: none;
+  transition:
+    border-color var(--bo-motion-fast) var(--bo-motion-ease-standard),
+    box-shadow var(--bo-motion-fast) var(--bo-motion-ease-standard),
+    transform var(--bo-motion-fast) var(--bo-motion-ease-standard);
+}
+
+.auth-form input:focus {
+  border-color: var(--bo-color-primary);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--bo-color-primary) 16%, transparent);
+}
+
+.auth-demo-link {
+  min-height: 44px;
+  border: 0;
+  padding: 0;
+  color: var(--bo-color-primary);
+  background: transparent;
+  cursor: pointer;
+  text-align: center;
+}
+
+.auth-demo-link:hover {
+  text-decoration: underline;
+}
+
+.auth-message {
+  margin: var(--bo-space-lg) 0 0;
+  padding: 12px 14px;
+  border: 1px solid var(--bo-color-border);
+  border-radius: var(--bo-radius-lg);
+  color: var(--bo-color-foreground-muted);
+  background: color-mix(in srgb, var(--bo-color-primary-soft) 54%, transparent);
+}
+
+.account-shell {
+  display: grid;
+  align-content: start;
+  gap: var(--bo-space-xl);
+}
+
+.account-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--bo-space-xl);
+  padding: clamp(12px, 3vw, 28px) 0;
+}
+
+.account-header h1 {
+  font-size: clamp(38px, 5vw, 58px);
+}
+
+.account-header__actions,
+.registration-row__actions,
+.review-card__header {
+  display: flex;
+  align-items: center;
+  gap: var(--bo-space-sm);
+}
+
+.account-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--bo-space-lg);
+}
+
+.review-card {
+  padding: clamp(22px, 4vw, 32px);
+  border-radius: var(--bo-radius-xxl);
+}
+
+.review-card__header {
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: var(--bo-space-xl);
+}
+
+.registration-list {
+  display: grid;
+  gap: var(--bo-space-md);
+}
+
+.registration-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--bo-space-lg);
+  padding: var(--bo-space-lg);
+  border: 1px solid var(--bo-color-border);
+  border-radius: var(--bo-radius-xl);
+  background: color-mix(in srgb, var(--bo-color-surface) 48%, transparent);
+}
+
+.registration-row strong,
+.registration-row span {
+  display: block;
+}
+
+.registration-row span {
+  margin-top: var(--bo-space-xs);
+  color: var(--bo-color-foreground-muted);
+  font-size: var(--bo-type-caption);
+}
+
+.account-loading {
+  width: min(520px, 100%);
+  margin: 20vh auto 0;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .auth-layout {
+    grid-template-columns: 1fr;
+    align-items: start;
+    padding-top: var(--bo-space-xl);
+  }
+
+  .auth-intro {
+    max-width: none;
+  }
+
+  .account-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .account-header,
+  .registration-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .registration-row__actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 600px) {
+  .auth-page {
+    padding:
+      max(var(--bo-space-lg), env(safe-area-inset-top))
+      max(var(--bo-space-lg), env(safe-area-inset-right))
+      max(var(--bo-space-lg), env(safe-area-inset-bottom))
+      max(var(--bo-space-lg), env(safe-area-inset-left));
+  }
+
+  .auth-layout,
+  .account-shell {
+    min-height: calc(100vh - 2 * var(--bo-space-lg));
+  }
+
+  .auth-card,
+  .review-card {
+    border-radius: var(--bo-radius-xl);
+  }
+
+  .account-header__actions,
+  .registration-row__actions {
+    width: 100%;
+  }
+
+  .account-header__actions .bo-button,
+  .registration-row__actions .bo-button {
+    flex: 1 1 140px;
+  }
+}
