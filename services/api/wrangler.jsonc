@@ -3,16 +3,139 @@
   "name": "boardops-api",
   "main": "src/index.ts",
   "compatibility_date": "2026-08-29",
-  "observability": { "enabled": true },
-  "vars": { "BOARDOPS_ENV": "development" },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+  "vars": {
+    "BOARDOPS_ENV": "development"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "boardops-development",
+      "database_id": "00000000-0000-0000-0000-000000000001",
+      "migrations_dir": "../../migrations/d1"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "FILES",
+      "bucket_name": "boardops-files-development"
+    }
+  ],
+  "queues": {
+    "producers": [
+      {
+        "binding": "EVENT_QUEUE",
+        "queue": "boardops-events-development"
+      }
+    ],
+    "consumers": [
+      {
+        "queue": "boardops-events-development",
+        "max_batch_size": 10,
+        "max_batch_timeout": 5,
+        "max_retries": 5,
+        "dead_letter_queue": "boardops-events-development-dlq"
+      }
+    ]
+  },
+  "workflows": [
+    {
+      "name": "boardops-foundation-workflow-development",
+      "binding": "FOUNDATION_WORKFLOW",
+      "class_name": "BoardOpsFoundationWorkflow"
+    }
+  ],
   "env": {
     "staging": {
       "name": "boardops-api-staging",
-      "vars": { "BOARDOPS_ENV": "staging" },
+      "vars": {
+        "BOARDOPS_ENV": "staging"
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "boardops-staging",
+          "database_id": "00000000-0000-0000-0000-000000000002",
+          "migrations_dir": "../../migrations/d1"
+        }
+      ],
+      "r2_buckets": [
+        {
+          "binding": "FILES",
+          "bucket_name": "boardops-files-staging"
+        }
+      ],
+      "queues": {
+        "producers": [
+          {
+            "binding": "EVENT_QUEUE",
+            "queue": "boardops-events-staging"
+          }
+        ],
+        "consumers": [
+          {
+            "queue": "boardops-events-staging",
+            "max_batch_size": 10,
+            "max_batch_timeout": 5,
+            "max_retries": 5,
+            "dead_letter_queue": "boardops-events-staging-dlq"
+          }
+        ]
+      },
+      "workflows": [
+        {
+          "name": "boardops-foundation-workflow-staging",
+          "binding": "FOUNDATION_WORKFLOW",
+          "class_name": "BoardOpsFoundationWorkflow"
+        }
+      ]
     },
     "production": {
       "name": "boardops-api-production",
-      "vars": { "BOARDOPS_ENV": "production" },
-    },
-  },
+      "vars": {
+        "BOARDOPS_ENV": "production"
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "boardops-production",
+          "database_id": "00000000-0000-0000-0000-000000000003",
+          "migrations_dir": "../../migrations/d1"
+        }
+      ],
+      "r2_buckets": [
+        {
+          "binding": "FILES",
+          "bucket_name": "boardops-files-production"
+        }
+      ],
+      "queues": {
+        "producers": [
+          {
+            "binding": "EVENT_QUEUE",
+            "queue": "boardops-events-production"
+          }
+        ],
+        "consumers": [
+          {
+            "queue": "boardops-events-production",
+            "max_batch_size": 10,
+            "max_batch_timeout": 5,
+            "max_retries": 5,
+            "dead_letter_queue": "boardops-events-production-dlq"
+          }
+        ]
+      },
+      "workflows": [
+        {
+          "name": "boardops-foundation-workflow-production",
+          "binding": "FOUNDATION_WORKFLOW",
+          "class_name": "BoardOpsFoundationWorkflow"
+        }
+      ]
+    }
+  }
 }

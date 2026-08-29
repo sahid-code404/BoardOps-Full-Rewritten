@@ -7,7 +7,11 @@
     "dev": "wrangler dev --port 8787",
     "build": "vite build",
     "typecheck": "wrangler types --env-interface CloudflareBindings && tsc --noEmit --pretty false",
-    "test": "vitest run --config vitest.config.ts"
+    "test": "vitest run --config vitest.config.ts",
+    "db:migrate:local": "wrangler d1 migrations apply DB --local",
+    "db:verify:local": "pnpm db:migrate:local && wrangler d1 execute DB --local --command \"PRAGMA foreign_key_check; PRAGMA integrity_check; SELECT COUNT(*) FROM institutions; SELECT COUNT(*) FROM idempotency_records; SELECT COUNT(*) FROM outbox_events; SELECT COUNT(*) FROM audit_events; SELECT COUNT(*) FROM background_tasks;\"",
+    "db:migrate:staging": "wrangler d1 migrations apply DB --remote --env staging",
+    "db:migrate:production": "wrangler d1 migrations apply DB --remote --env production"
   },
   "dependencies": {
     "hono": "4.13.5"
