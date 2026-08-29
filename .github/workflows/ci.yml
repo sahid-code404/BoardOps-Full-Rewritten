@@ -34,6 +34,19 @@ jobs:
         run: pnpm test
       - name: D1 migration verification
         run: pnpm db:verify:local
+      - name: Authentication end-to-end smoke
+        run: |
+          pnpm --filter @boardops/api dev > /tmp/boardops-api.log 2>&1 &
+          API_PID=$!
+          trap 'kill $API_PID 2>/dev/null || true' EXIT
+          for attempt in {1..30}; do
+            if curl --silent --fail http://127.0.0.1:8787/api/v1/health > /dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          curl --silent --fail http://127.0.0.1:8787/api/v1/health > /dev/null
+          pnpm auth:smoke:local
       - name: Builds
         run: pnpm build
 
